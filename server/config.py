@@ -1,0 +1,5 @@
+SERVER_SECRET = "0n4b5vzl21h!)e$-60^jr(twjmiu!^712di@%uelklyou1952&"
+DATABASE_HOST = "localhost"
+DATABASE_USERNAME = "cs411"
+DATABASE_PASSWORD = "Segf@ults411"
+DATABASE_NAME = "IlliniSale"

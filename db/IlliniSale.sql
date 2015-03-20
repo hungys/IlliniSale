@@ -1,0 +1,129 @@
+DROP DATABASE IF EXISTS `IlliniSale`;
+
+CREATE DATABASE `IlliniSale`;
+USE `IlliniSale`;
+
+CREATE TABLE `User`
+(
+    `UserId` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `Email` NVARCHAR(100) NOT NULL,
+    `Password` NVARCHAR(50),
+    `FacebookId` NVARCHAR(20),
+    `Nickname` NVARCHAR(30),
+    `FirstName` NVARCHAR(30),
+    `LastName` NVARCHAR(30),
+    `ProfilePic` NVARCHAR(30),
+    `MobilePhone` NVARCHAR(15),
+    `Gender` INT,
+    `Birthday` DATETIME,
+    `SchoolEmail` NVARCHAR(100),
+    `SchoolVerified` INT,
+    `CreateAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `UpdateAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `Product`
+(
+    `ProductId` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `UserId` INT NOT NULL,
+    `Name` NVARCHAR(100),
+    `Category` NVARCHAR(20),
+    `Description` NVARCHAR(1000),
+    `Price` REAL,
+    `Location` NVARCHAR(150),
+    `IsSold` INT,
+    `Ranking` REAL,
+    `CreateAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `UpdateAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `Photo`
+(
+    `PhotoId` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `ProductId` INT NOT NULL,
+    `FileName` NVARCHAR(30),
+    `CreateAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `Tag`
+(
+    `TagId` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `ProductId` INT NOT NULL,
+    `Name` NVARCHAR(20),
+    `CreateAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `Bid`
+(
+    `BidId` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `UserId` INT NOT NULL,
+    `ProductId` INT NOT NULL,
+    `Price` REAL,
+    `Status` VARCHAR(10),
+    `CreateAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `Follow`
+(
+    `FollowerUserId` INT NOT NULL,
+    `FollowingUserId` INT NOT NULL,
+    `CreateAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`FollowerUserId`, `FollowingUserId`)
+);
+
+CREATE TABLE `Likes`
+(
+    `UserId` INT NOT NULL,
+    `ProductId` INT NOT NULL,
+    `CreateAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`UserId`, `ProductId`)
+);
+
+CREATE TABLE `Review`
+(
+    `ReviewId` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `FromUserId` INT NOT NULL,
+    `ToUserId` INT NOT NULL,
+    `Body` NVARCHAR(500),
+    `Rating` INT,
+    `CreateAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `Comment`
+(
+    `CommentId` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `UserId` INT NOT NULL,
+    `ProductId` INT NOT NULL,
+    `Body` NVARCHAR(500),
+    `Response` NVARCHAR(500),
+    `CreateAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `UpdateAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `Message`
+(
+    `MessageId` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `SmallerUserId` INT NOT NULL,
+    `GreaterUserId` INT NOT NULL,
+    `SpeakerUserId` INT NOT NULL,
+    `Body` NVARCHAR(500),
+    `CreateAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `Wantlist`
+(
+    `WantlistId` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `UserId` INT NOT NULL,
+    `Name` NVARCHAR(30),
+    `CreateAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `UpdateAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `Notification`
+(
+    `NotificationId` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `UserId` INT NOT NULL,
+    `Body` NVARCHAR(100),
+    `Link` NVARCHAR(150),
+    `CreateAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
