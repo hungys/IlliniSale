@@ -56,4 +56,5 @@ docs/_build/
 target/
 
 # Virtualenv
+venv/
 server/venv
