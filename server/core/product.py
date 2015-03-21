@@ -8,7 +8,7 @@ product = Blueprint("product", __name__)
 def get_products(category):
     cur = g.db.cursor()
     cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
-        Product.Category, Product.Description, Product.Price, Product.Location, \
+        Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
         User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender \
         FROM Product, User WHERE Product.Category = %s AND \
         User.UserId = Product.UserId", (category,))
@@ -20,18 +20,20 @@ def get_products(category):
             "product_id": product_data[0],
             "seller": {
                 "user_id": product_data[1],
-                "nickname": product_data[7],
-                "first_name": product_data[8],
-                "last_name": product_data[9],
-                "profile_pic": product_data[10],
-                "gender": product_data[11]
+                "nickname": product_data[8],
+                "first_name": product_data[9],
+                "last_name": product_data[10],
+                "profile_pic": product_data[11],
+                "gender": product_data[12]
             },
             "name": product_data[2],
             "category": product_data[3],
             "description": product_data[4],
             "price": product_data[5],
             "location": product_data[6],
-            "photos": []
+            "photo": "",
+            "likes": 0,
+            "is_sold": product_data[7]
         })
 
     resp = make_response(json.dumps(resp_body), 200)
@@ -42,17 +44,22 @@ def get_products(category):
 def get_product(product_id):
     cur = g.db.cursor()
     cur.execute("SELECT Product.UserId, Product.Name, Product.Category, \
-        Product.Description, Product.Price, Product.Location, User.Nickname, \
+        Product.Description, Product.Price, Product.Location, Product.IsSold, User.Nickname, \
         User.FirstName, User.LastName, User.ProfilePic, User.Gender \
         FROM Product, User WHERE Product.ProductId = %s AND \
         User.UserId = Product.UserId", str(product_id))
     product_data = cur.fetchone()
 
+    cur.execute("SELECT Name FROM Tag WHERE ProductId = %s", str(product_id))
+    tags_data = cur.fetchall()
+    product_tags = []
+    for tag_data in tags_data:
+        product_tags.append(tag_data[0])
+
     cur.execute("SELECT Comment.CommentId, Comment.UserId, Comment.Body, Comment.Response, \
         unix_timestamp(Comment.CreateAt), unix_timestamp(Comment.UpdateAt), \
         User.Nickname, User.ProfilePic FROM Comment, User WHERE \
         Comment.ProductId = %s AND Comment.UserId = User.UserId", str(product_id))
-
     comments_data = cur.fetchall()
     product_comments = []
     for comment_data in comments_data:
@@ -74,11 +81,11 @@ def get_product(product_id):
         "product_id": product_id,
         "seller": {
             "user_id": product_data[0],
-            "nickname": product_data[6],
-            "first_name": product_data[7],
-            "last_name": product_data[8],
-            "profile_pic": product_data[9],
-            "gender": product_data[10]
+            "nickname": product_data[7],
+            "first_name": product_data[8],
+            "last_name": product_data[9],
+            "profile_pic": product_data[10],
+            "gender": product_data[11]
         },
         "name": product_data[1],
         "category": product_data[2],
@@ -86,7 +93,11 @@ def get_product(product_id):
         "price": product_data[4],
         "location": product_data[5],
         "photos": [],
-        "comments": product_comments
+        "comments": product_comments,
+        "tags": product_tags,
+        "is_sold": product_data[6],
+        "likes": 0,
+        "is_liked": 0
     }
 
     resp = make_response(json.dumps(resp_body), 200)
@@ -98,7 +109,7 @@ def search_product():
     keyword_pattern = "%" + request.args.get("keyword").lower() + "%"
     cur = g.db.cursor()
     cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
-        Product.Category, Product.Description, Product.Price, Product.Location, \
+        Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
         User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender \
         FROM Product, User WHERE LOWER(Product.Name) LIKE %s AND \
         User.UserId = Product.UserId", (keyword_pattern,))
@@ -110,18 +121,20 @@ def search_product():
             "product_id": product_data[0],
             "seller": {
                 "user_id": product_data[1],
-                "nickname": product_data[7],
-                "first_name": product_data[8],
-                "last_name": product_data[9],
-                "profile_pic": product_data[10],
-                "gender": product_data[11]
+                "nickname": product_data[8],
+                "first_name": product_data[9],
+                "last_name": product_data[10],
+                "profile_pic": product_data[11],
+                "gender": product_data[12]
             },
             "name": product_data[2],
             "category": product_data[3],
             "description": product_data[4],
             "price": product_data[5],
             "location": product_data[6],
-            "photos": []
+            "photo": "",
+            "likes": 0,
+            "is_sold": product_data[7]
         })
 
     resp = make_response(json.dumps(resp_body), 200)
@@ -138,9 +151,14 @@ def post_product():
         req_body["name"], req_body["category"], req_body["description"], 
         str(req_body["price"]), req_body["location"]))
 
+    product_id = cur.lastrowid
+
+    for tag in req_body["tags"]:
+        cur.execute("INSERT INTO Tag(ProductId, Name) VALUES(%s, %s)", (str(product_id), tag))
+
     g.db.commit()
 
-    resp_body = {"product_id": cur.lastrowid}
+    resp_body = {"product_id": product_id}
 
     resp = make_response(json.dumps(resp_body), 200)
     resp.headers["Content-Type"] = "application/json"

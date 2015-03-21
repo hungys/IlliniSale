@@ -8,17 +8,17 @@ import config
 app = Flask(__name__)
 
 from core.user import user
-app.register_blueprint(user)
+app.register_blueprint(user, url_prefix="/api")
 from core.product import product
-app.register_blueprint(product)
+app.register_blueprint(product, url_prefix="/api")
 from core.wantlist import wantlist
-app.register_blueprint(wantlist)
+app.register_blueprint(wantlist, url_prefix="/api")
 from core.message import message
-app.register_blueprint(message)
+app.register_blueprint(message, url_prefix="/api")
 from core.bid import bid
-app.register_blueprint(bid)
+app.register_blueprint(bid, url_prefix="/api")
 from core.comment import comment
-app.register_blueprint(comment)
+app.register_blueprint(comment, url_prefix="/api")
 
 @app.before_request
 def before_request():

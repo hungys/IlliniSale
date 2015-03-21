@@ -17,13 +17,29 @@ def get_user_profile(user_id):
     if user_data is None:
         abort(404)
 
+    cur.execute("SELECT COUNT(ProductId) FROM Product WHERE UserId = %s", str(user_id))
+    product_count = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(User.UserId) FROM User, Follow \
+        WHERE Follow.FollowingUserId = %s AND User.UserId = Follow.FollowerUserId", 
+        str(user_id))
+    follower_count = cur.fetchone()[0]
+
+    cur.execute("SELECT COUNT(User.UserId) FROM User, Follow \
+        WHERE Follow.FollowerUserId = %s AND User.UserId = Follow.FollowingUserId", 
+        str(user_id))
+    following_count = cur.fetchone()[0]
+
     resp_body = {
         "nickname": user_data[0],
         "first_name": user_data[1],
         "last_name": user_data[2],
         "profile_pic": user_data[3],
         "gender": bool(user_data[4]),
-        "register_time": user_data[5]
+        "register_time": user_data[5],
+        "product_count": product_count,
+        "follower_count": follower_count,
+        "following_count": following_count
     }
 
     resp = make_response(json.dumps(resp_body), 200)
@@ -47,7 +63,9 @@ def get_user_follower(user_id):
             "first_name": follower_data[2],
             "last_name": follower_data[3],
             "profile_pic": follower_data[4],
-            "gender": bool(follower_data[5])
+            "gender": bool(follower_data[5]),
+            "product_count": 0,
+            "follower_count": 0
         })
 
     resp = make_response(json.dumps(resp_body), 200)
@@ -71,7 +89,9 @@ def get_user_following(user_id):
             "first_name": following_data[2],
             "last_name": following_data[3],
             "profile_pic": following_data[4],
-            "gender": bool(following_data[5])
+            "gender": bool(following_data[5]),
+            "product_count": 0,
+            "follower_count": 0
         })
 
     resp = make_response(json.dumps(resp_body), 200)
@@ -81,8 +101,8 @@ def get_user_following(user_id):
 @user.route('/user/<int:user_id>/product', methods=['GET'])
 def get_user_product(user_id):
     cur = g.db.cursor()
-    cur.execute("SELECT ProductId, UserId, Name, Category, Description, Price, Location \
-        FROM Product WHERE UserId = %s", str(user_id))
+    cur.execute("SELECT ProductId, UserId, Name, Category, Description, \
+        Price, Location, IsSold FROM Product WHERE UserId = %s", str(user_id))
     products_data = cur.fetchall()
 
     resp_body = []
@@ -94,8 +114,50 @@ def get_user_product(user_id):
             "description": product_data[4],
             "price": product_data[5],
             "location": product_data[6],
-            "photos": ""
+            "photo": "",
+            "likes": 0,
+            "is_sold": product_data[7]
         })
+
+    resp = make_response(json.dumps(resp_body), 200)
+    resp.headers["Content-Type"] = "application/json"
+    return resp
+
+@user.route('/user/<int:user_id>/review', methods=['GET'])
+def get_user_review(user_id):
+    cur = g.db.cursor()
+    cur.execute("SELECT Review.ReviewId, Review.FromUserId, Review.Body, \
+        Review.Rating, unix_timestamp(Review.CreateAt), User.Nickname, \
+        User.FirstName, User.LastName, User.ProfilePic, User.Gender \
+        FROM Review, User WHERE Review.ToUserId = %s AND \
+        User.UserId = Review.FromUserId", str(user_id))
+    reviews_data = cur.fetchall()
+
+    cur.execute("SELECT AVG(Rating) FROM Review WHERE \
+        Review.ToUserId = %s", str(user_id))
+    avg_rating = float(cur.fetchone()[0])
+
+    reviews = []
+    for review_data in reviews_data:
+        reviews.append({
+            "review_id": review_data[0],
+            "reviewer": {
+                "user_id": review_data[1],
+                "nickname": review_data[5],
+                "first_name": review_data[6],
+                "last_name": review_data[7],
+                "profile_pic": review_data[8],
+                "gender": review_data[9]
+            },
+            "content": review_data[2],
+            "rating": review_data[3],
+            "timestamp": review_data[4]
+        })
+
+    resp_body = {
+        "average": avg_rating,
+        "reviews": reviews
+    }
 
     resp = make_response(json.dumps(resp_body), 200)
     resp.headers["Content-Type"] = "application/json"
