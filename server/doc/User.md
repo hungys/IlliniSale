@@ -46,6 +46,11 @@ Response: (array)
 ]
 ```
 
+Todo:
+
+* value of product_count
+* value of follower_count
+
 # Get the list of following users
 
 Endpoint: `GET /api/user/<user_id>/following`
@@ -68,6 +73,11 @@ Response: (array)
     }
 ]
 ```
+
+Todo:
+
+* value of product_count
+* value of follower_count
 
 # Get user's products
 
@@ -92,6 +102,10 @@ Response: (array)
     }
 ]
 ```
+
+Todo:
+
+* is_liked field
 
 # Get user's review
 
@@ -129,6 +143,11 @@ Endpoint: `POST /api/user/auth`
 
 Login required: No
 
+Comment:
+
+* token should be stored by client/browser for further requests
+* token may be expired
+
 Request:
 
 ```
@@ -145,6 +164,10 @@ Response:
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxfQ.jCMWRmaMpLh9n2lul8xmLe4hGHFA-VMQiY2ikdME4kA"
 }
 ```
+
+Todo:
+
+* token expiration (never expired now)
 
 # Register a new user
 
