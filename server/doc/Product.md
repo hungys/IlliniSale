@@ -38,6 +38,10 @@ Response: (array)
 ]
 ```
 
+Todo:
+
+* is_liked field
+
 # Get single product
 
 Endpoint: `GET /api/product/<product_id>`
@@ -48,6 +52,7 @@ Response:
 
 ```
 {
+    "post_time": 1426950178,
     "description": "90% new",
     "tags": [
         "Microsoft",
@@ -89,6 +94,11 @@ Response:
 }
 ```
 
+Todo:
+
+* related products (e.g. people view A also view B)
+* price comparisons with 3rd-party websites
+
 # Post a new product
 
 Endpoint: `POST /api/product`
@@ -122,7 +132,7 @@ Developing...
 
 # Search for products
 
-Endpoint: `GET api/product/query?keyword=<keyword>`
+Endpoint: `GET api/product/query?keyword=<keyword>?page=<page_number>`
 
 Login required: No
 
@@ -155,6 +165,10 @@ Response: (array)
     }
 ]
 ```
+
+Todo:
+
+* is_liked field
 
 # Edit a product
 

@@ -50,7 +50,8 @@ def get_products(category):
 def get_product(product_id):
     cur = g.db.cursor()
     cur.execute("SELECT Product.UserId, Product.Name, Product.Category, \
-        Product.Description, Product.Price, Product.Location, Product.IsSold, User.Nickname, \
+        Product.Description, Product.Price, Product.Location, Product.IsSold, \
+        unix_timestamp(Product.CreateAt), User.Nickname, \
         User.FirstName, User.LastName, User.ProfilePic, User.Gender \
         FROM Product, User WHERE Product.ProductId = %s AND \
         User.UserId = Product.UserId", str(product_id))
@@ -80,6 +81,15 @@ def get_product(product_id):
             "user_profile_pic": comment_data[7]
         })
 
+    cur.execute("SELECT FileName FROM Photo WHERE ProductId = %s", str(product_id))
+    photos_data = cur.fetchall()
+    product_photos = []
+    for photo_data in photos_data:
+        product_photos.append(photo_data[0])
+
+    cur.execute("SELECT UserId FROM Likes WHERE ProductId = %s", str(product_id))
+    is_liked = 0 if cur.fetchone() is None else 1
+
     if product_data is None:
         abort(404)
     
@@ -87,23 +97,24 @@ def get_product(product_id):
         "product_id": product_id,
         "seller": {
             "user_id": product_data[0],
-            "nickname": product_data[7],
-            "first_name": product_data[8],
-            "last_name": product_data[9],
-            "profile_pic": product_data[10],
-            "gender": product_data[11]
+            "nickname": product_data[8],
+            "first_name": product_data[9],
+            "last_name": product_data[10],
+            "profile_pic": product_data[11],
+            "gender": product_data[12]
         },
         "name": product_data[1],
         "category": product_data[2],
         "description": product_data[3],
         "price": product_data[4],
         "location": product_data[5],
-        "photos": [],
+        "photos": product_photos,
         "comments": product_comments,
         "tags": product_tags,
         "is_sold": product_data[6],
+        "post_time": product_data[7],
         "likes": 0,
-        "is_liked": 0
+        "is_liked": is_liked
     }
 
     resp = make_response(json.dumps(resp_body), 200)
