@@ -3,11 +3,14 @@ Product API
 
 # Get products of a category
 
-Endpoint: `GET /api/product/category/<category_name>`
-
-Supported categories: TBD
+Endpoint: `GET /api/product/category/<category_name>?page=<page_number>`
 
 Login required: No
+
+Comment:
+
+* Supported categories: TBD
+* The API will return maximum 30 records per page
 
 Response: (array)
 
@@ -122,6 +125,10 @@ Developing...
 Endpoint: `GET api/product/query?keyword=<keyword>`
 
 Login required: No
+
+Comment:
+
+* The API will return maximum 30 records per page
 
 Response: (array)
 

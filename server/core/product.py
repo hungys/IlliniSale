@@ -6,12 +6,18 @@ product = Blueprint("product", __name__)
 
 @product.route('/product/category/<string:category>', methods=['GET'])
 def get_products(category):
+    page = request.args.get("page")
+    page = 1 if page is None else int(page)
+    rows_per_page = 30
+    offset = rows_per_page * (page - 1)
+
     cur = g.db.cursor()
     cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
         Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
         User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender \
         FROM Product, User WHERE Product.Category = %s AND \
-        User.UserId = Product.UserId", (category,))
+        User.UserId = Product.UserId ORDER BY Product.Ranking \
+        LIMIT %s,%s", (category, offset, rows_per_page))
     products_data = cur.fetchall()
 
     resp_body = []
@@ -107,12 +113,18 @@ def get_product(product_id):
 @product.route('/product/query', methods=['GET'])
 def search_product():
     keyword_pattern = "%" + request.args.get("keyword").lower() + "%"
+    page = request.args.get("page")
+    page = 1 if page is None else int(page)
+    rows_per_page = 30
+    offset = rows_per_page * (page - 1)
+
     cur = g.db.cursor()
     cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
         Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
         User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender \
         FROM Product, User WHERE LOWER(Product.Name) LIKE %s AND \
-        User.UserId = Product.UserId", (keyword_pattern,))
+        User.UserId = Product.UserId ORDER BY Product.Ranking \
+        LIMIT %s,%s", (keyword_pattern, offset, rows_per_page))
     products_data = cur.fetchall()
 
     resp_body = []
