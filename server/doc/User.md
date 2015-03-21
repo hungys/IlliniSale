@@ -1,6 +1,7 @@
-# User API
+User API
+========
 
-## Get user's profile
+# Get user's profile
 
 Endpoint: `GET /user/<use_id>/profile`
 
@@ -22,7 +23,7 @@ Response:
 }
 ```
 
-## Get user's followers
+# Get user's followers
 
 Endpoint: `GET /api/user/<user_id>/follower`
 
@@ -45,7 +46,7 @@ Response: (array)
 ]
 ```
 
-## Get the list of following users
+# Get the list of following users
 
 Endpoint: `GET /api/user/<user_id>/following`
 
@@ -68,7 +69,7 @@ Response: (array)
 ]
 ```
 
-## Get user's products
+# Get user's products
 
 Endpoint: `GET /api/user/<user_id>/product`
 
@@ -92,7 +93,7 @@ Response: (array)
 ]
 ```
 
-## Get user's review
+# Get user's review
 
 Endpoint: `GET /api/user/<user_id>/review`
 
@@ -122,7 +123,7 @@ Response:
 }
 ```
 
-## Request for access token
+# Request for access token
 
 Endpoint: `POST /api/user/auth`
 
@@ -145,7 +146,7 @@ Response:
 }
 ```
 
-## Register a new user
+# Register a new user
 
 Endpoint: `POST /api/user`
 
@@ -168,17 +169,15 @@ Request:
 
 Response: Empty
 
-## Edit user's profile
+# Edit user's profile
 
 Developing...
 
-## Follow/unfollow a user
+# Follow/unfollow a user
 
 Endpoint: `POST /api/user/<user_id>/follow`
 
 Login required: Yes
-
-Request: Empty
 
 Response:
 
@@ -188,7 +187,7 @@ Response:
 }
 ```
 
-## Post review to user
+# Post review to user
 
 Endpoint: `POST /api/user/<user_id>/review`
 
