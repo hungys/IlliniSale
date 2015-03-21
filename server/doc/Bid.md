@@ -50,6 +50,10 @@ Endpoint: `PUT /api/bid/<bid_id>`
 
 Login required: Yes
 
+Comment:
+
+* return 403 if operates on other user's product
+
 Request:
 
 ```

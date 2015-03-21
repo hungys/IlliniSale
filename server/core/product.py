@@ -16,7 +16,7 @@ def get_products(category):
         Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
         User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender \
         FROM Product, User WHERE Product.Category = %s AND \
-        User.UserId = Product.UserId ORDER BY Product.Ranking \
+        User.UserId = Product.UserId ORDER BY Product.Ranking,Product.CreateAt DESC \
         LIMIT %s,%s", (category, offset, rows_per_page))
     products_data = cur.fetchall()
 
@@ -134,7 +134,7 @@ def search_product():
         Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
         User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender \
         FROM Product, User WHERE LOWER(Product.Name) LIKE %s AND \
-        User.UserId = Product.UserId ORDER BY Product.Ranking \
+        User.UserId = Product.UserId ORDER BY Product.Ranking,Product.CreateAt DESC \
         LIMIT %s,%s", (keyword_pattern, offset, rows_per_page))
     products_data = cur.fetchall()
 
