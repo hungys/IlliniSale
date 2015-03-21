@@ -58,7 +58,7 @@ Request:
 
 ```
 {
-    "accept": 1
+    "accept": 1   // 1 to accept, 0 to reject
 }
 ```
 

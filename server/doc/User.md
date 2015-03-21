@@ -206,7 +206,7 @@ Response:
 
 ```
 {
-    "followed": true
+    "followed": true   // current followed status
 }
 ```
 

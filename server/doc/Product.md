@@ -184,7 +184,7 @@ Response:
 
 ```
 {
-    "liked": true
+    "liked": true   // current liked status
 }
 ```
 
