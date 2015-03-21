@@ -208,7 +208,7 @@ def post_product_comment(product_id):
     resp.headers["Content-Type"] = "application/json"
     return resp
 
-@product.route('/product/<int:product_id>/like', methods=['POST'])
+@product.route('/product/<int:product_id>/like', methods=['PUT'])
 @auth.login_required
 def toggle_product_like(product_id):
     cur = g.db.cursor()

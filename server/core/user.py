@@ -163,7 +163,7 @@ def get_user_review(user_id):
     resp.headers["Content-Type"] = "application/json"
     return resp
 
-@user.route('/user/<int:user_id>/follow', methods=['POST'])
+@user.route('/user/<int:user_id>/follow', methods=['PUT'])
 @auth.login_required
 def toggle_user_follow(user_id):
     if user_id == g.user_id:

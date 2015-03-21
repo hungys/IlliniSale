@@ -175,7 +175,7 @@ Developing...
 
 # Follow/unfollow a user
 
-Endpoint: `POST /api/user/<user_id>/follow`
+Endpoint: `PUT /api/user/<user_id>/follow`
 
 Login required: Yes
 
