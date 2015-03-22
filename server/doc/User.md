@@ -93,10 +93,6 @@ Response: (array)
 ]
 ```
 
-Todo:
-
-* is_liked field
-
 # Get user's review
 
 Endpoint: `GET /api/user/<user_id>/review`

@@ -12,12 +12,23 @@ def get_products(category):
     offset = rows_per_page * (page - 1)
 
     cur = g.db.cursor()
-    cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
-        Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
-        User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender \
-        FROM Product, User WHERE Product.Category = %s AND \
-        User.UserId = Product.UserId ORDER BY Product.Ranking,Product.CreateAt DESC \
-        LIMIT %s,%s", (category, offset, rows_per_page))
+    if g.user_id is None:
+        cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
+            Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
+            User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), 0 \
+            FROM Product, User WHERE Product.Category = %s AND \
+            User.UserId = Product.UserId ORDER BY Product.Ranking,Product.CreateAt DESC \
+            LIMIT %s,%s", (category, offset, rows_per_page))
+    else:
+        cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
+            Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
+            User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s) \
+            FROM Product, User WHERE Product.Category = %s AND \
+            User.UserId = Product.UserId ORDER BY Product.Ranking,Product.CreateAt DESC \
+            LIMIT %s,%s", (str(g.user_id), category, offset, rows_per_page))
     products_data = cur.fetchall()
 
     resp_body = []
@@ -38,8 +49,9 @@ def get_products(category):
             "price": product_data[5],
             "location": product_data[6],
             "photo": "",
-            "likes": 0,
-            "is_sold": product_data[7]
+            "is_sold": product_data[7],
+            "likes": product_data[13],
+            "is_liked": product_data[14]
         })
 
     resp = make_response(json.dumps(resp_body), 200)
@@ -52,7 +64,8 @@ def get_product(product_id):
     cur.execute("SELECT Product.UserId, Product.Name, Product.Category, \
         Product.Description, Product.Price, Product.Location, Product.IsSold, \
         unix_timestamp(Product.CreateAt), User.Nickname, \
-        User.FirstName, User.LastName, User.ProfilePic, User.Gender \
+        User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
+        (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId) \
         FROM Product, User WHERE Product.ProductId = %s AND \
         User.UserId = Product.UserId", str(product_id))
     product_data = cur.fetchone()
@@ -113,7 +126,7 @@ def get_product(product_id):
         "tags": product_tags,
         "is_sold": product_data[6],
         "post_time": product_data[7],
-        "likes": 0,
+        "likes": product_data[13],
         "is_liked": is_liked
     }
 
@@ -130,12 +143,23 @@ def search_product():
     offset = rows_per_page * (page - 1)
 
     cur = g.db.cursor()
-    cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
-        Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
-        User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender \
-        FROM Product, User WHERE LOWER(Product.Name) LIKE %s AND \
-        User.UserId = Product.UserId ORDER BY Product.Ranking,Product.CreateAt DESC \
-        LIMIT %s,%s", (keyword_pattern, offset, rows_per_page))
+    if g.user_id is None:
+        cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
+            Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
+            User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), 0 \
+            FROM Product, User WHERE LOWER(Product.Name) LIKE %s AND \
+            User.UserId = Product.UserId ORDER BY Product.Ranking,Product.CreateAt DESC \
+            LIMIT %s,%s", (keyword_pattern, offset, rows_per_page))
+    else:
+        cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
+            Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
+            User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s) \
+            FROM Product, User WHERE LOWER(Product.Name) LIKE %s AND \
+            User.UserId = Product.UserId ORDER BY Product.Ranking,Product.CreateAt DESC \
+            LIMIT %s,%s", (str(g.user_id), keyword_pattern, offset, rows_per_page))
     products_data = cur.fetchall()
 
     resp_body = []
@@ -156,8 +180,9 @@ def search_product():
             "price": product_data[5],
             "location": product_data[6],
             "photo": "",
-            "likes": 0,
-            "is_sold": product_data[7]
+            "is_sold": product_data[7],
+            "likes": product_data[13],
+            "is_liked": product_data[14]
         })
 
     resp = make_response(json.dumps(resp_body), 200)

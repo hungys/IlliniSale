@@ -38,10 +38,6 @@ Response: (array)
 ]
 ```
 
-Todo:
-
-* is_liked field
-
 # Get single product
 
 Endpoint: `GET /api/product/<product_id>`
@@ -165,10 +161,6 @@ Response: (array)
     }
 ]
 ```
-
-Todo:
-
-* is_liked field
 
 # Edit a product
 

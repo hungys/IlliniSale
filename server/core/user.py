@@ -105,8 +105,17 @@ def get_user_following(user_id):
 @user.route('/user/<int:user_id>/product', methods=['GET'])
 def get_user_product(user_id):
     cur = g.db.cursor()
-    cur.execute("SELECT ProductId, UserId, Name, Category, Description, \
-        Price, Location, IsSold FROM Product WHERE UserId = %s", str(user_id))
+    if g.user_id is None:
+        cur.execute("SELECT ProductId, UserId, Name, Category, Description, \
+            Price, Location, IsSold, \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), 0 \
+            FROM Product WHERE UserId = %s", str(user_id))
+    else:
+        cur.execute("SELECT ProductId, UserId, Name, Category, Description, \
+            Price, Location, IsSold, \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s) \
+            FROM Product WHERE UserId = %s", (str(g.user_id), str(user_id)))
     products_data = cur.fetchall()
 
     resp_body = []
@@ -119,8 +128,9 @@ def get_user_product(user_id):
             "price": product_data[5],
             "location": product_data[6],
             "photo": "",
-            "likes": 0,
-            "is_sold": product_data[7]
+            "is_sold": product_data[7],
+            "likes": product_data[8],
+            "is_liked": product_data[9]
         })
 
     resp = make_response(json.dumps(resp_body), 200)

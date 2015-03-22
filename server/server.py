@@ -24,9 +24,16 @@ app.register_blueprint(comment, url_prefix="/api")
 def before_request():
     g.db = connect_db()
 
+    g.user_id = None
     auth_header = request.headers.get("Authorization")
     if auth_header is not None and auth_header.startswith("Bearer "):
-        g.token = auth_header.split(" ")[1]
+        token = auth_header.split(" ")[1]
+        payload = jwt.decode(token, config.SERVER_SECRET, algorithms=['HS256'])
+        cur = g.db.cursor()
+        cur.execute("SELECT UserId FROM User WHERE UserId = %s", str(payload["user_id"]))
+        user_data = cur.fetchone()
+        if user_data:
+            g.user_id = payload["user_id"]
 
 @app.after_request
 def after_request(response):
@@ -42,21 +49,20 @@ def after_request(response):
 
 @auth.verify_password
 def verify_password(username, password):
-    if g.token is None:
-        return False
+    return False if g.user_id is None else True
 
-    try:
-        payload = jwt.decode(g.token, config.SERVER_SECRET, algorithms=['HS256'])
-        cur = g.db.cursor()
-        cur.execute("SELECT UserId FROM User WHERE UserId = %s", str(payload["user_id"]))
-        user_data = cur.fetchone()
-        if user_data:
-            g.user_id = payload["user_id"]
-            return True
-        else:
-            return False
-    except:
-        return False
+    # try:
+    #     payload = jwt.decode(g.token, config.SERVER_SECRET, algorithms=['HS256'])
+    #     cur = g.db.cursor()
+    #     cur.execute("SELECT UserId FROM User WHERE UserId = %s", str(payload["user_id"]))
+    #     user_data = cur.fetchone()
+    #     if user_data:
+    #         g.user_id = payload["user_id"]
+    #         return True
+    #     else:
+    #         return False
+    # except:
+    #     return False
 
 @auth.error_handler
 def unauthorized():
