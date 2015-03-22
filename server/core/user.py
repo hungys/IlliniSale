@@ -50,9 +50,11 @@ def get_user_profile(user_id):
 def get_user_follower(user_id):
     cur = g.db.cursor()
     cur.execute("SELECT User.UserId, User.Nickname, User.FirstName, User.LastName, \
-        User.ProfilePic, User.Gender FROM User, Follow \
-        WHERE Follow.FollowingUserId = %s AND User.UserId = Follow.FollowerUserId", 
-        str(user_id))
+        User.ProfilePic, User.Gender, \
+        (SELECT COUNT(*) FROM Product WHERE Product.UserId = F1.FollowerUserId), \
+        (SELECT COUNT(*) FROM Follow F2 WHERE F2.FollowingUserId = F1.FollowerUserId) \
+        FROM User, Follow F1 WHERE F1.FollowingUserId = %s AND \
+        User.UserId = F1.FollowerUserId", str(user_id))
     followers_data = cur.fetchall()
 
     resp_body = []
@@ -64,8 +66,8 @@ def get_user_follower(user_id):
             "last_name": follower_data[3],
             "profile_pic": follower_data[4],
             "gender": bool(follower_data[5]),
-            "product_count": 0,
-            "follower_count": 0
+            "product_count": follower_data[6],
+            "follower_count": follower_data[7]
         })
 
     resp = make_response(json.dumps(resp_body), 200)
@@ -76,9 +78,11 @@ def get_user_follower(user_id):
 def get_user_following(user_id):
     cur = g.db.cursor()
     cur.execute("SELECT User.UserId, User.Nickname, User.FirstName, User.LastName, \
-        User.ProfilePic, User.Gender FROM User, Follow \
-        WHERE Follow.FollowerUserId = %s AND User.UserId = Follow.FollowingUserId", 
-        str(user_id))
+        User.ProfilePic, User.Gender, \
+        (SELECT COUNT(*) FROM Product WHERE Product.UserId = F1.FollowingUserId), \
+        (SELECT COUNT(*) FROM Follow F2 WHERE F2.FollowingUserId = F1.FollowingUserId) \
+        FROM User, Follow F1 WHERE F1.FollowerUserId = %s AND \
+        User.UserId = F1.FollowingUserId", str(user_id))
     followings_data = cur.fetchall()
 
     resp_body = []
@@ -90,8 +94,8 @@ def get_user_following(user_id):
             "last_name": following_data[3],
             "profile_pic": following_data[4],
             "gender": bool(following_data[5]),
-            "product_count": 0,
-            "follower_count": 0
+            "product_count": following_data[6],
+            "follower_count": following_data[7]
         })
 
     resp = make_response(json.dumps(resp_body), 200)

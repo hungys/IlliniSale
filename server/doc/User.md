@@ -46,11 +46,6 @@ Response: (array)
 ]
 ```
 
-Todo:
-
-* value of product_count
-* value of follower_count
-
 # Get the list of following users
 
 Endpoint: `GET /api/user/<user_id>/following`
@@ -73,11 +68,6 @@ Response: (array)
     }
 ]
 ```
-
-Todo:
-
-* value of product_count
-* value of follower_count
 
 # Get user's products
 
