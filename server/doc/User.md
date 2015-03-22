@@ -82,8 +82,9 @@ Response: (array)
     {
         "category": "3C",
         "is_sold": 0,
-        "likes": 0,
+        "likes": 2,
         "product_id": 1,
+        "is_liked": 1,
         "location": "PAR",
         "photo": "",
         "description": "all new",

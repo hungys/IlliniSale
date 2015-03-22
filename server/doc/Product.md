@@ -17,23 +17,24 @@ Response: (array)
 ```
 [
     {
-        "category": "3C",
-        "is_sold": 0,
-        "likes": 0,
-        "product_id": 1,
-        "name": "MBPR",
-        "location": "PAR",
+        "description": "really good condition",
         "photo": "",
-        "description": "all new",
-        "price": 100,
+        "price": 250,
+        "is_sold": null,
+        "likes": 0,
+        "name": "Play Station 4",
+        "category": "3C",
+        "product_id": 6,
         "seller": {
-            "profile_pic": "user1.jpg",
-            "first_name": "Yu-Hsin",
+            "profile_pic": "user2.jpg",
+            "first_name": "Yu-Hsin2",
             "last_name": "Hung",
-            "user_id": 1,
-            "gender": 0,
-            "nickname": "Hungys"
-        }
+            "user_id": 2,
+            "gender": 1,
+            "nickname": "Hungys2"
+        },
+        "location": "Green St.",
+        "is_liked": 0
     }
 ]
 ```
@@ -141,15 +142,14 @@ Response: (array)
 ```
 [
     {
-        "category": "3C",
-        "is_sold": 0,
-        "likes": 0,
-        "product_id": 1,
-        "name": "MBPR",
-        "location": "PAR",
-        "photo": "",
         "description": "all new",
+        "photo": "",
         "price": 100,
+        "is_sold": 0,
+        "likes": 2,
+        "name": "MBPR",
+        "category": "3C",
+        "product_id": 1,
         "seller": {
             "profile_pic": "user1.jpg",
             "first_name": "Yu-Hsin",
@@ -157,7 +157,9 @@ Response: (array)
             "user_id": 1,
             "gender": 0,
             "nickname": "Hungys"
-        }
+        },
+        "location": "PAR",
+        "is_liked": 1
     }
 ]
 ```
