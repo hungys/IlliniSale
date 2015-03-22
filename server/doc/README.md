@@ -22,10 +22,8 @@ Response:
 }
 ```
 
-Attach token in the header for all login-required resources **everytime**,
+Attach token in the **Authorization header** for all login-required resources **everytime**,
 
 ```
-HTTP Basic Authentication
-Username: token you get
-Password: unused
+Authorization: Bearer <token you get>
 ```

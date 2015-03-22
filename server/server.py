@@ -24,6 +24,10 @@ app.register_blueprint(comment, url_prefix="/api")
 def before_request():
     g.db = connect_db()
 
+    auth_header = request.headers.get("Authorization")
+    if auth_header is not None and auth_header.startswith("Bearer "):
+        g.token = auth_header.split(" ")[1]
+
 @app.after_request
 def after_request(response):
     if g.db:
@@ -36,9 +40,12 @@ def after_request(response):
     return response
 
 @auth.verify_password
-def verify_password(token, password):
+def verify_password(username, password):
+    if g.token is None:
+        return False
+
     try:
-        payload = jwt.decode(token, config.SERVER_SECRET, algorithms=['HS256'])
+        payload = jwt.decode(g.token, config.SERVER_SECRET, algorithms=['HS256'])
         cur = g.db.cursor()
         cur.execute("SELECT UserId FROM User WHERE UserId = %s", str(payload["user_id"]))
         user_data = cur.fetchone()
