@@ -220,6 +220,39 @@ def register_user():
 
     return '', 200
 
+@user.route('/user', methods=['PUT'])
+@auth.login_required
+def edit_user():
+    try:
+        req_body = json.loads(request.data)
+    except:
+        abort(400)
+
+    cur = g.db.cursor()
+    cur.execute("SELECT Password, Nickname, FirstName, LastName, MobilePhone, Gender, Birthday \
+        FROM User WHERE UserId = %s", str(g.user_id))
+    user_data = cur.fetchone()
+
+    if user_data is None:
+        abort(404)
+
+    password_hashed = md5(req_body["password"]).hexdigest() if "password" in req_body else user_data[0]
+    nickname = req_body["nickname"] if "nickname" in req_body else user_data[1]
+    first_name = req_body["first_name"] if "first_name" in req_body else user_data[2]
+    last_name = req_body["last_name"] if "last_name" in req_body else user_data[3]
+    mobile_phone = req_body["mobile_phone"] if "mobile_phone" in req_body else user_data[4]
+    gender = req_body["gender"] if "gender" in req_body else user_data[5]
+    birthday = req_body["birthday"] if "birthday" in req_body else user_data[6]
+
+    cur.execute("UPDATE User SET Password = %s, Nickname = %s, FirstName = %s, \
+        LastName = %s, MobilePhone = %s, Gender = %s, Birthday = %s \
+        WHERE UserId = %s", (password_hashed, nickname, first_name, 
+        last_name, mobile_phone, gender, birthday, str(g.user_id)))
+
+    g.db.commit()
+
+    return '', 200
+
 @user.route('/user/auth', methods=['POST'])
 def get_user_token():
     req_body = json.loads(request.data)

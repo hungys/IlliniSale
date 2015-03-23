@@ -181,7 +181,29 @@ Response: Empty
 
 # Edit user's profile
 
-Developing...
+Endpoint: `PUT /api/user`
+
+Login required: Yes
+
+Comment:
+
+* The properties not provided in request payload will remain for the old value
+
+Request:
+
+```
+{
+    "password": "12345",
+    "nickname": "Jimmy",
+    "first_name": "Yu-Hsin",
+    "last_name": "Hung",
+    "gender": 0,
+    "mobile_phone": "6262412272",
+    "birthday": "1993/3/19"
+}
+```
+
+Response: Empty
 
 # Follow/unfollow a user
 
