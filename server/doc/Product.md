@@ -9,8 +9,29 @@ Login required: No
 
 Comment:
 
-* Supported categories: TBD
 * The API will return maximum 30 records per page
+* Supported categories:
+    * 3c-tech
+    * for-her
+    * for-him
+    * baby-kids
+    * luxury
+    * pet-accessories
+    * furniture-home
+    * kitchen-appliances
+    * vintage-antiques
+    * cars-motors
+    * beauty-products
+    * textbooks
+    * lifestyle-gadgets
+    * design-craft
+    * music-instruments
+    * photography
+    * sporting-gear
+    * books
+    * tickets-vouchers
+    * games-toys
+    * everything-else
 
 Response: (array)
 
