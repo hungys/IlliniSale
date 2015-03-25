@@ -43,7 +43,7 @@ def after_request(response):
     response.headers.add("Access-Control-Allow-Origin", "*")
     response.headers.add("Access-Control-Allow-Credentials", "true")
     response.headers.add("Access-Control-Allow-Headers", "Authorization, Content-Type")
-    response.headers.add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+    response.headers.add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 
     return response
 
