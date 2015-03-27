@@ -177,7 +177,13 @@ Request:
 }
 ```
 
-Response: Empty
+Response:
+
+```
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxfQ.jCMWRmaMpLh9n2lul8xmLe4hGHFA-VMQiY2ikdME4kA"
+}
+```
 
 # Edit user's profile
 

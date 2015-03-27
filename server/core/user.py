@@ -218,7 +218,12 @@ def register_user():
 
     g.db.commit()
 
-    return '', 200
+    token = jwt.encode({"user_id": cur.lastrowid}, config.SERVER_SECRET, algorithm="HS256")
+    resp_body = {"token": token}
+
+    resp = make_response(json.dumps(resp_body), 200)
+    resp.headers["Content-Type"] = "application/json"
+    return resp
 
 @user.route('/user', methods=['PUT'])
 @auth.login_required
