@@ -1,3 +1,6 @@
+from tornado.wsgi import WSGIContainer
+from tornado.httpserver import HTTPServer
+from tornado.ioloop import IOLoop
 from flask import Flask, g, request, make_response
 from core.database import connect_db
 from core.permission import auth
@@ -72,5 +75,10 @@ def unauthorized():
 def not_found(error):
     return make_response(json.dumps({"msg": "Not found"}), 404)
 
+# if __name__ == '__main__':
+#     app.run(host='0.0.0.0', debug=True)
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    http_server = HTTPServer(WSGIContainer(app))
+    http_server.listen(5000)
+    IOLoop.instance().start()
