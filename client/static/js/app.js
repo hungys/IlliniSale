@@ -35,6 +35,10 @@ var myapp = angular.module('myApp', ['ngStorage', 'ngRoute'])
                 templateUrl: 'static/partial/product_sell.html',
                 controller: 'ProductSellController'
             })
+            .when('/product/query', {
+                templateUrl: 'static/partial/product_query.html',
+                controller: 'ProductQueryController'
+            })
             .when('/product/:product_id', {
                 templateUrl: 'static/partial/product_detail.html',
                 controller: 'ProductDetailController'
@@ -96,6 +100,11 @@ myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$locatio
             $route.reload();
             $location.path('/');
         });
+    };
+
+    $scope.search = function() {
+        $location.path('/product/query').search('keyword', $("#navbar_search").val());
+        $("#navbar_search").val("");
     };
 
     $scope.isLoggedIn = AuthService.IsLoggedIn();
@@ -169,4 +178,12 @@ myapp.controller('ProductSellController', ['$scope', '$http', '$location', '$rou
                 alertify.error("Fail to submit, try again later!");
             });
     }
+}]);
+
+myapp.controller('ProductQueryController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
+    $scope.keyword = $location.search().keyword
+
+    $http.get('http://127.0.0.1:5000/api/product/query?keyword=' + $scope.keyword).success(function(response) {
+        $scope.products_list = response
+    });
 }]);
