@@ -31,6 +31,10 @@ var myapp = angular.module('myApp', ['ngStorage', 'ngRoute'])
                 templateUrl: 'static/partial/product_category.html',
                 controller: 'ProductCategoryController'
             })
+            .when('/product/sell', {
+                templateUrl: 'static/partial/product_sell.html',
+                controller: 'ProductSellController'
+            })
             .when('/product/:product_id', {
                 templateUrl: 'static/partial/product_detail.html',
                 controller: 'ProductDetailController'
@@ -146,4 +150,23 @@ myapp.controller('ProductDetailController', ['$scope', '$http', '$location', '$r
     $http.get('http://127.0.0.1:5000/api/product/' + $scope.productId).success(function(response) {
         $scope.product = response
     });
+}]);
+
+myapp.controller('ProductSellController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
+    $scope.submit = function() {
+        $http.post('http://127.0.0.1:5000/api/product', {
+                name: $("#name").val(),
+                category: $("#category").val(),
+                description: $("#description").val(),
+                price: parseInt($("#price").val()),
+                location: $("#location").val(),
+                tags: []
+            })
+            .success(function(response) {
+                alertify.success("Your product has been posted.");
+                $location.path('/product/' + response.product_id);
+            }).error(function(data, status, headers, config) {
+                alertify.error("Fail to submit, try again later!");
+            });
+    }
 }]);
