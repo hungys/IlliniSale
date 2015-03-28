@@ -26,6 +26,10 @@ var myapp = angular.module('myApp', ['ngStorage', 'ngRoute'])
             .when('/user/register', {
                 templateUrl: 'static/partial/user_register.html',
                 controller: 'UserRegisterController'
+            })
+            .when('/product/all/:category', {
+                templateUrl: 'static/partial/product_category.html',
+                controller: 'ProductCategoryController'
             });
     });
 
@@ -83,10 +87,12 @@ myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$locatio
 }]);
 
 myapp.controller('LandingPageController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
-
+    document.title = "IlliniSale";
 }]);
 
 myapp.controller('UserLoginController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
+    document.title = "Login - IlliniSale";
+
     $scope.login = function() {
         if ($("#email").val() === "" || $("#password").val() === "") {
             alertify.error("Email and password cannot be empty!");
@@ -108,4 +114,13 @@ myapp.controller('UserLoginController', ['$scope', '$http', '$location', '$route
 
 myapp.controller('UserRegisterController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
 
+}]);
+
+myapp.controller('ProductCategoryController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
+    $scope.categoryId = $route.current.params.category;
+    $scope.categoryName = $scope.categoryId;
+
+    $http.get('http://127.0.0.1:5000/api/product/category/' + $scope.categoryId).success(function(response) {
+        $scope.products_list = response
+    });
 }]);
