@@ -1,4 +1,4 @@
-'use struct';
+'use strict';
 
 var myapp = angular.module('myApp', ['ngStorage', 'ngRoute'])
     .config(['$httpProvider', function($httpProvider) {
