@@ -1,0 +1,64 @@
+<script>
+    $('#product_tab a').click(function(e) {
+        e.preventDefault()
+        $(this).tab('show')
+    })
+</script>
+
+<br/>
+<br/>
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <img src="http://placehold.it/360x360">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h3>{{product.name}}</h3>
+                <p><span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{product.seller.nickname}}</p>
+                <p><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> ${{product.price}}</p>
+                <p><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {{product.location}}</p>
+                <p><button type="button" class="btn btn-primary">Bid to buy</button></p>
+                <p><button type="button" class="btn btn-default">Like this</button></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div role="tabpanel">
+                    <ul class="nav nav-tabs" role="tablist" id="product_tab">
+                        <li role="presentation" class="active"><a href="#description" aria-controls="description" role="tab" data-toggle="tab">Description</a></li>
+                        <li role="presentation"><a href="#comments" aria-controls="comments" role="tab" data-toggle="tab">Comments</a></li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane fade in active" id="description">
+                            <br/>
+                            <p>{{product.description}}</p>
+                        </div>
+                        <div role="tabpanel" class="tab-pane fade" id="comments">
+                            <br/>
+                            <div ng-repeat="comment in product.comments">
+                                <p><strong>{{comment.user_nickname}}</strong></p>
+                                <p>{{comment.content}}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-5">
+
+    </div>
+</div>

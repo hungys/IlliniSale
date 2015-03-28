@@ -30,6 +30,10 @@ var myapp = angular.module('myApp', ['ngStorage', 'ngRoute'])
             .when('/product/all/:category', {
                 templateUrl: 'static/partial/product_category.html',
                 controller: 'ProductCategoryController'
+            })
+            .when('/product/:product_id', {
+                templateUrl: 'static/partial/product_detail.html',
+                controller: 'ProductDetailController'
             });
     });
 
@@ -72,11 +76,16 @@ myapp.factory('AuthService', ['$http', '$rootScope', '$localStorage', function($
 }]);
 
 myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', function($scope, $rootScope, $http, $location, $route, AuthService) {
-    $scope.isLoggedIn = AuthService.IsLoggedIn();
-
     $rootScope.$on("auth_changed", function() {
         $scope.isLoggedIn = AuthService.IsLoggedIn();
+        $scope.get_current_user();
     });
+
+    $scope.get_current_user = function() {
+        $http.get('http://127.0.0.1:5000/api/user/1/profile').success(function(response) {
+            $scope.current_user = response
+        });
+    };
 
     $scope.logout = function() {
         AuthService.Logout(function() {
@@ -84,6 +93,12 @@ myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$locatio
             $location.path('/');
         });
     };
+
+    $scope.isLoggedIn = AuthService.IsLoggedIn();
+
+    if ($scope.isLoggedIn) {
+        $scope.get_current_user();
+    }
 }]);
 
 myapp.controller('LandingPageController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
@@ -122,5 +137,13 @@ myapp.controller('ProductCategoryController', ['$scope', '$http', '$location', '
 
     $http.get('http://127.0.0.1:5000/api/product/category/' + $scope.categoryId).success(function(response) {
         $scope.products_list = response
+    });
+}]);
+
+myapp.controller('ProductDetailController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
+    $scope.productId = $route.current.params.product_id;
+
+    $http.get('http://127.0.0.1:5000/api/product/' + $scope.productId).success(function(response) {
+        $scope.product = response
     });
 }]);
