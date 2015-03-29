@@ -152,6 +152,18 @@ myapp.controller('ProductCategoryController', ['$scope', '$http', '$location', '
     $scope.categoryId = $route.current.params.category;
     $scope.categoryName = $scope.categoryId;
 
+    $scope.like = function(product) {
+        $http.put('http://127.0.0.1:5000/api/product/' + product.product_id + "/like").success(function(response) {
+            if (!product.is_liked && response.liked) {
+                product.is_liked = 1;
+                product.likes = product.likes + 1;
+            } else if (product.is_liked && !response.liked) {
+                product.is_liked = 0;
+                product.likes = product.likes - 1;
+            }
+        });
+    };
+
     $http.get('http://127.0.0.1:5000/api/product/category/' + $scope.categoryId).success(function(response) {
         $scope.products_list = response
     });
@@ -198,6 +210,18 @@ myapp.controller('ProductSellController', ['$scope', '$http', '$location', '$rou
 
 myapp.controller('ProductQueryController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
     $scope.keyword = $location.search().keyword
+
+    $scope.like = function(product) {
+        $http.put('http://127.0.0.1:5000/api/product/' + product.product_id + "/like").success(function(response) {
+            if (!product.is_liked && response.liked) {
+                product.is_liked = 1;
+                product.likes = product.likes + 1;
+            } else if (product.is_liked && !response.liked) {
+                product.is_liked = 0;
+                product.likes = product.likes - 1;
+            }
+        });
+    };
 
     $http.get('http://127.0.0.1:5000/api/product/query?keyword=' + $scope.keyword).success(function(response) {
         $scope.products_list = response
