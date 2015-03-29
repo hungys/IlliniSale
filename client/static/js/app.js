@@ -83,6 +83,7 @@ myapp.factory('AuthService', ['$http', '$rootScope', '$localStorage', function($
                 password: password
             })
             .success(function(response) {
+                $localStorage.user_id = response.user_id
                 $localStorage.token = response.token
                 $rootScope.$broadcast("auth_changed");
                 success_callback(response);
@@ -92,6 +93,7 @@ myapp.factory('AuthService', ['$http', '$rootScope', '$localStorage', function($
     };
 
     service.Logout = function(callback) {
+        $localStorage.user_id = null;
         $localStorage.token = null;
         $rootScope.$broadcast("auth_changed");
         callback();
@@ -123,17 +125,24 @@ myapp.factory('AppService', ['$rootScope', function($rootScope) {
         }
     };
 
+    service.GetCurrentTime = function() {
+        var d = new Date();
+        return Math.round(d.getTime() / 1000);
+    };
+
     return service;
 }]);
 
-myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $location, $route, AuthService, AppService) {
+myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$localStorage', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $localStorage, $location, $route, AuthService, AppService) {
     $rootScope.$on("auth_changed", function() {
         $scope.isLoggedIn = AuthService.IsLoggedIn();
         $scope.get_current_user();
     });
 
     $scope.get_current_user = function() {
-        $http.get('http://127.0.0.1:5000/api/user/1/profile').success(function(response) {
+        $http.get('http://127.0.0.1:5000/api/user/' + $localStorage.user_id + '/profile').success(function(response) {
+            $rootScope.current_user = response
+            $rootScope.current_user.user_id = $localStorage.user_id
             $scope.current_user = response
         });
     };
@@ -209,7 +218,7 @@ myapp.controller('ProductCategoryController', ['$scope', '$http', '$location', '
     });
 }]);
 
-myapp.controller('ProductDetailController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
+myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $location, $route, AuthService, AppService) {
     $scope.productId = $route.current.params.product_id;
 
     $scope.like = function() {
@@ -224,8 +233,31 @@ myapp.controller('ProductDetailController', ['$scope', '$http', '$location', '$r
         });
     };
 
+    $scope.submit_comment = function() {
+        $http.post('http://127.0.0.1:5000/api/product/' + $scope.productId + '/comment', {
+                content: $("#new_comment").val()
+            })
+            .success(function(response) {
+                $scope.product.comments.splice(0, 0, {
+                    content: $("#new_comment").val(),
+                    comment_time: AppService.GetCurrentTime(),
+                    user_id: $rootScope.current_user.user_id,
+                    user_profile_pic: $rootScope.current_user.profile_pic,
+                    comment_id: response.comment_id,
+                    response: "",
+                    response_time: 0,
+                    user_nickname: $rootScope.current_user.nickname
+                });
+                $scope.product.comment_count = $scope.product.comment_count + 1;
+                alertify.success("Your comment has been posted.");
+            }).error(function(data, status, headers, config) {
+                alertify.error("Fail to submit, try again later!");
+            });
+    }
+
     $http.get('http://127.0.0.1:5000/api/product/' + $scope.productId).success(function(response) {
         $scope.product = response
+        $scope.product.comment_count = $scope.product.comments.length;
     });
 }]);
 

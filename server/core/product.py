@@ -79,7 +79,8 @@ def get_product(product_id):
     cur.execute("SELECT Comment.CommentId, Comment.UserId, Comment.Body, Comment.Response, \
         unix_timestamp(Comment.CreateAt), unix_timestamp(Comment.UpdateAt), \
         User.Nickname, User.ProfilePic FROM Comment, User WHERE \
-        Comment.ProductId = %s AND Comment.UserId = User.UserId", str(product_id))
+        Comment.ProductId = %s AND Comment.UserId = User.UserId \
+        ORDER BY Comment.CreateAt DESC", str(product_id))
     comments_data = cur.fetchall()
     product_comments = []
     for comment_data in comments_data:

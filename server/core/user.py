@@ -31,6 +31,7 @@ def get_user_profile(user_id):
     following_count = cur.fetchone()[0]
 
     resp_body = {
+        "user_id": user_id,
         "nickname": user_data[0],
         "first_name": user_data[1],
         "last_name": user_data[2],
@@ -60,7 +61,6 @@ def get_user_follower(user_id):
     resp_body = []
     for follower_data in followers_data:
         resp_body.append({
-            "user_id": follower_data[0],
             "nickname": follower_data[1],
             "first_name": follower_data[2],
             "last_name": follower_data[3],
@@ -271,7 +271,10 @@ def get_user_token():
         abort(401)
     else:
         token = jwt.encode({"user_id": user_data[0]}, config.SERVER_SECRET, algorithm="HS256")
-        resp_body = {"token": token}
+        resp_body = {
+            "user_id": user_data[0],
+            "token": token
+        }
 
     resp = make_response(json.dumps(resp_body), 200)
     resp.headers["Content-Type"] = "application/json"

@@ -38,7 +38,7 @@
                 <div role="tabpanel">
                     <ul class="nav nav-tabs" role="tablist" id="product_tab">
                         <li role="presentation" class="active"><a href="#description" aria-controls="description" role="tab" data-toggle="tab">Description</a></li>
-                        <li role="presentation"><a href="#comments" aria-controls="comments" role="tab" data-toggle="tab">Comments</a></li>
+                        <li role="presentation"><a href="#comments" aria-controls="comments" role="tab" data-toggle="tab">Comments ({{product.comment_count}})</a></li>
                     </ul>
 
                     <div class="tab-content">
@@ -52,6 +52,12 @@
                                 <p><strong>{{comment.user_nickname}}</strong></p>
                                 <p>{{comment.content}}</p>
                             </div>
+                            <form>
+                                <div class="form-group">
+                                    <textarea class="form-control" rows="3" id="new_comment" placeholder="Write a public comment..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-default" ng-click="submit_comment()">Submit</button>
+                            </form>
                         </div>
                     </div>
 
