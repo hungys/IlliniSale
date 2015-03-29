@@ -37,7 +37,8 @@
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Category <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
-                        <li><a href="#/product/all/3c-tech">3c-tech</a></li>
+                        <li ng-repeat="category in category_list"><a href="#/product/all/{{category.id}}">{{category.name}}</a></li>
+                        <!-- <li><a href="#/product/all/3c-tech">3c-tech</a></li>
                         <li><a href="#/product/all/for-her">for-her</a></li>
                         <li><a href="#/product/all/for-him">for-him</a></li>
                         <li><a href="#/product/all/baby-kids">baby-kids</a></li>
@@ -57,7 +58,7 @@
                         <li><a href="#/product/all/books">books</a></li>
                         <li><a href="#/product/all/tickets-vouchers">tickets-vouchers</a></li>
                         <li><a href="#/product/all/games-toys">games-toys</a></li>
-                        <li><a href="#/product/all/everything-else">everything-else</a></li>
+                        <li><a href="#/product/all/everything-else">everything-else</a></li> -->
                     </ul>
                 </li>
             </ul>

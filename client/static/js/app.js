@@ -47,6 +47,31 @@ var myapp = angular.module('myApp', ['ngStorage', 'ngRoute'])
                 templateUrl: 'static/partial/user_profile.html',
                 controller: 'UserProfileController'
             });
+    })
+    .run(function($rootScope) {
+        $rootScope.category_list = [
+            {id: "3c-tech", name: "3C Technology"},
+            {id: "for-her", name: "For Her"},
+            {id: "for-him", name: "For Him"},
+            {id: "baby-kids", name: "Baby & Kids"},
+            {id: "luxury", name: "Luxury"},
+            {id: "pet-accessories", name: "Pet Accessories"},
+            {id: "furniture-home", name: "Furniture & Home"},
+            {id: "kitchen-appliances", name: "Kitchen & Appliances"},
+            {id: "vintage-antiques", name: "Vintage & Antiques"},
+            {id: "cars-motors", name: "Car & Motors"},
+            {id: "beauty-products", name: "Beauty Products"},
+            {id: "textbooks", name: "Textbooks"},
+            {id: "lifestyle-gadgets", name: "Lifestyle Gadgets"},
+            {id: "design-craft", name: "Design & Craft"},
+            {id: "music-instruments", name: "Music Instruments"},
+            {id: "photography", name: "Photography"},
+            {id: "sporting-gear", name: "Sporting Gear"},
+            {id: "books", name: "Books"},
+            {id: "tickets-vouchers", name: "Tickets / Vouchers"},
+            {id: "games-toys", name: "Games & Toys"},
+            {id: "everything-else", name: "Everything Else"}
+        ];
     });
 
 myapp.factory('AuthService', ['$http', '$rootScope', '$localStorage', function($http, $rootScope, $localStorage) {
@@ -87,7 +112,21 @@ myapp.factory('AuthService', ['$http', '$rootScope', '$localStorage', function($
     return service;
 }]);
 
-myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', function($scope, $rootScope, $http, $location, $route, AuthService) {
+myapp.factory('AppService', ['$rootScope', function($rootScope) {
+    var service = {};
+
+    service.GetCategoryName = function(category_id) {
+        for (var i = 0; i < $rootScope.category_list.length; i++) {
+            if ($rootScope.category_list[i].id == category_id) {
+                return $rootScope.category_list[i].name;
+            }
+        }
+    };
+
+    return service;
+}]);
+
+myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $location, $route, AuthService, AppService) {
     $rootScope.$on("auth_changed", function() {
         $scope.isLoggedIn = AuthService.IsLoggedIn();
         $scope.get_current_user();
@@ -111,6 +150,7 @@ myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$locatio
         $("#navbar_search").val("");
     };
 
+    $scope.category_list = $rootScope.category_list;
     $scope.isLoggedIn = AuthService.IsLoggedIn();
 
     if ($scope.isLoggedIn) {
@@ -118,11 +158,11 @@ myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$locatio
     }
 }]);
 
-myapp.controller('LandingPageController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
+myapp.controller('LandingPageController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
     document.title = "IlliniSale";
 }]);
 
-myapp.controller('UserLoginController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
+myapp.controller('UserLoginController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
     document.title = "Login - IlliniSale";
 
     $scope.login = function() {
@@ -144,13 +184,13 @@ myapp.controller('UserLoginController', ['$scope', '$http', '$location', '$route
     };
 }]);
 
-myapp.controller('UserRegisterController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
+myapp.controller('UserRegisterController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
 
 }]);
 
-myapp.controller('ProductCategoryController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
+myapp.controller('ProductCategoryController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
     $scope.categoryId = $route.current.params.category;
-    $scope.categoryName = $scope.categoryId;
+    $scope.categoryName = AppService.GetCategoryName($scope.categoryId);
 
     $scope.like = function(product) {
         $http.put('http://127.0.0.1:5000/api/product/' + product.product_id + "/like").success(function(response) {
@@ -169,7 +209,7 @@ myapp.controller('ProductCategoryController', ['$scope', '$http', '$location', '
     });
 }]);
 
-myapp.controller('ProductDetailController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
+myapp.controller('ProductDetailController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
     $scope.productId = $route.current.params.product_id;
 
     $scope.like = function() {
@@ -189,7 +229,7 @@ myapp.controller('ProductDetailController', ['$scope', '$http', '$location', '$r
     });
 }]);
 
-myapp.controller('ProductSellController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
+myapp.controller('ProductSellController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
     $scope.submit = function() {
         $http.post('http://127.0.0.1:5000/api/product', {
                 name: $("#name").val(),
@@ -208,7 +248,7 @@ myapp.controller('ProductSellController', ['$scope', '$http', '$location', '$rou
     }
 }]);
 
-myapp.controller('ProductQueryController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
+myapp.controller('ProductQueryController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
     $scope.keyword = $location.search().keyword
 
     $scope.like = function(product) {
@@ -228,7 +268,7 @@ myapp.controller('ProductQueryController', ['$scope', '$http', '$location', '$ro
     });
 }]);
 
-myapp.controller('UserProfileController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
+myapp.controller('UserProfileController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
     $scope.userId = $route.current.params.user_id;
 
     $http.get('http://127.0.0.1:5000/api/user/' + $scope.userId + "/profile").success(function(response) {
