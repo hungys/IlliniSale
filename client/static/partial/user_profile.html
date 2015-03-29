@@ -1,0 +1,99 @@
+<style>
+    .name-truncate {
+        width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+<script>
+    $('#user_tab a').click(function(e) {
+        e.preventDefault()
+        $(this).tab('show')
+    })
+</script>
+
+<br/>
+<br/>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="http://placehold.it/100x100" class="img-circle">
+                    </div>
+                    <div class="col-md-8">
+                        <h4>{{user.first_name}} {{user.last_name}}</h4>
+                        <p>@{{user.nickname}}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <br/>
+                        <button type="button" class="btn btn-primary">Follow</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div role="tabpanel">
+            <ul class="nav nav-tabs" role="tablist" id="user_tab">
+                <li role="presentation" class="active"><a href="#product" aria-controls="product" role="tab" data-toggle="tab">Product ({{user.product_count}})</a></li>
+                <li role="presentation"><a href="#follower" aria-controls="follower" role="tab" data-toggle="tab">Follower ({{user.follower_count}})</a></li>
+                <li role="presentation"><a href="#following" aria-controls="following" role="tab" data-toggle="tab">Following ({{user.following_count}})</a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane fade in active" id="product">
+                    <br/>
+                    <div class="col-md-4" ng-repeat="product in products_list">
+                        <div class="thumbnail">
+                            <a href="#/product/{{product.product_id}}"><img src="http://placehold.it/200x200"><a/>
+                                <div class="caption">
+                                    <h3 class="name-truncate"><a href="#/product/{{product.product_id}}">{{product.name}}</a></h3>
+                                    <p><span class="glyphicon glyphicon-usd" aria-hidden="true"></span> {{product.price}}</p>
+                                    <p><span class="glyphicon glyphicon-heart" aria-hidden="true"></span> {{product.likes}} user liked</p>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane fade" id="follower">
+                    <br/>
+                    <div class="col-md-4" ng-repeat="follower in followers_list">
+                        <div class="thumbnail">
+                            <a href="#/user/{{follower.user_id}}"><img src="http://placehold.it/120x120" class="img-circle"><a/>
+                                <div class="caption text-center">
+                                    <strong><a href="#/user/{{follower.user_id}}">{{follower.nickname}}</a></strong>
+                                    <p>{{follower.product_count}} products · {{follower.follower_count}} followers</p>
+                                    <p><button type="button" class="btn btn-default btn-block">Follow</button></p>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane fade" id="following">
+                    <br/>
+                    <div class="col-md-4" ng-repeat="following in followings_list">
+                        <div class="thumbnail">
+                            <a href="#/user/{{following.user_id}}"><img src="http://placehold.it/120x120" class="img-circle"><a/>
+                                <div class="caption text-center">
+                                    <strong><a href="#/user/{{following.user_id}}">{{following.nickname}}</a></strong>
+                                    <p>{{following.product_count}} products · {{following.follower_count}} followers</p>
+                                    <p><button type="button" class="btn btn-default btn-block">Follow</button></p>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -20,7 +20,7 @@
         <div class="panel panel-default">
             <div class="panel-body">
                 <h3>{{product.name}}</h3>
-                <p><span class="glyphicon glyphicon-user" aria-hidden="true"></span> {{product.seller.nickname}}</p>
+                <p><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <a href="#/user/{{product.seller.user_id}}">{{product.seller.nickname}}</a></p>
                 <p><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> ${{product.price}}</p>
                 <p><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {{product.location}}</p>
                 <p><button type="button" class="btn btn-primary">Bid to buy</button></p>

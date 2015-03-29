@@ -42,6 +42,10 @@ var myapp = angular.module('myApp', ['ngStorage', 'ngRoute'])
             .when('/product/:product_id', {
                 templateUrl: 'static/partial/product_detail.html',
                 controller: 'ProductDetailController'
+            })
+            .when('/user/:user_id', {
+                templateUrl: 'static/partial/user_profile.html',
+                controller: 'UserProfileController'
             });
     });
 
@@ -185,5 +189,25 @@ myapp.controller('ProductQueryController', ['$scope', '$http', '$location', '$ro
 
     $http.get('http://127.0.0.1:5000/api/product/query?keyword=' + $scope.keyword).success(function(response) {
         $scope.products_list = response
+    });
+}]);
+
+myapp.controller('UserProfileController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
+    $scope.userId = $route.current.params.user_id;
+
+    $http.get('http://127.0.0.1:5000/api/user/' + $scope.userId + "/profile").success(function(response) {
+        $scope.user = response
+    });
+
+    $http.get('http://127.0.0.1:5000/api/user/' + $scope.userId + "/product").success(function(response) {
+        $scope.products_list = response
+    });
+
+    $http.get('http://127.0.0.1:5000/api/user/' + $scope.userId + "/follower").success(function(response) {
+        $scope.followers_list = response
+    });
+
+    $http.get('http://127.0.0.1:5000/api/user/' + $scope.userId + "/following").success(function(response) {
+        $scope.followings_list = response
     });
 }]);
