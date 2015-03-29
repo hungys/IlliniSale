@@ -24,7 +24,8 @@
                 <p><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> ${{product.price}}</p>
                 <p><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {{product.location}}</p>
                 <p><button type="button" class="btn btn-primary">Bid to buy</button></p>
-                <p><button type="button" class="btn btn-default">Like this</button></p>
+                <p><button type="button" ng-class="{1: 'btn btn-danger', 0: 'btn btn-default'}[product.is_liked]" ng-click="like()" ng-hide="product.is_liked">Like this ({{product.likes}})</button></p>
+                <p><button type="button" ng-class="{1: 'btn btn-danger', 0: 'btn btn-default'}[product.is_liked]" ng-click="like()" ng-show="product.is_liked">Unlike this ({{product.likes}})</button></p>
             </div>
         </div>
     </div>

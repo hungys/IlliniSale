@@ -160,6 +160,18 @@ myapp.controller('ProductCategoryController', ['$scope', '$http', '$location', '
 myapp.controller('ProductDetailController', ['$scope', '$http', '$location', '$route', 'AuthService', function($scope, $http, $location, $route, AuthService) {
     $scope.productId = $route.current.params.product_id;
 
+    $scope.like = function() {
+        $http.put('http://127.0.0.1:5000/api/product/' + $scope.productId + "/like").success(function(response) {
+            if (!$scope.product.is_liked && response.liked) {
+                $scope.product.is_liked = 1;
+                $scope.product.likes = $scope.product.likes + 1;
+            } else if ($scope.product.is_liked && !response.liked) {
+                $scope.product.is_liked = 0;
+                $scope.product.likes = $scope.product.likes - 1;
+            }
+        });
+    };
+
     $http.get('http://127.0.0.1:5000/api/product/' + $scope.productId).success(function(response) {
         $scope.product = response
     });

@@ -100,8 +100,11 @@ def get_product(product_id):
     for photo_data in photos_data:
         product_photos.append(photo_data[0])
 
-    cur.execute("SELECT UserId FROM Likes WHERE ProductId = %s", str(product_id))
-    is_liked = 0 if cur.fetchone() is None else 1
+    if g.user_id is None:
+        is_liked = 0
+    else:
+        cur.execute("SELECT UserId FROM Likes WHERE ProductId = %s AND UserId = %s", (str(product_id), str(g.user_id)))
+        is_liked = 0 if cur.fetchone() is None else 1
 
     if product_data is None:
         abort(404)
