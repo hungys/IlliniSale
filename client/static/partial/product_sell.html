@@ -12,7 +12,8 @@
             <div class="form-group">
                 <label for="category">Category</label>
                 <select class="form-control" id="category">
-                    <option>3c-tech</option>
+                    <option ng-repeat="category in category_list" value="{{category.id}}">{{category.name}}</option>
+                    <!-- <option>3c-tech</option>
                     <option>for-her</option>
                     <option>for-him</option>
                     <option>baby-kids</option>
@@ -32,7 +33,7 @@
                     <option>books</option>
                     <option>tickets-vouchers</option>
                     <option>games-toys</option>
-                    <option>everything-else</option>
+                    <option>everything-else</option> -->
                 </select>
             </div>
             <div class="form-group">

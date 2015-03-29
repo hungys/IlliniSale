@@ -229,7 +229,7 @@ myapp.controller('ProductDetailController', ['$scope', '$http', '$location', '$r
     });
 }]);
 
-myapp.controller('ProductSellController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
+myapp.controller('ProductSellController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $location, $route, AuthService, AppService) {
     $scope.submit = function() {
         $http.post('http://127.0.0.1:5000/api/product', {
                 name: $("#name").val(),
@@ -245,7 +245,9 @@ myapp.controller('ProductSellController', ['$scope', '$http', '$location', '$rou
             }).error(function(data, status, headers, config) {
                 alertify.error("Fail to submit, try again later!");
             });
-    }
+    };
+
+    $scope.category_list = $rootScope.category_list;
 }]);
 
 myapp.controller('ProductQueryController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
