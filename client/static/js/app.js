@@ -90,7 +90,7 @@ myapp.factory('AuthService', ['$http', '$rootScope', '$localStorage', function($
     var service = {};
 
     service.Login = function(email, password, success_callback, error_callback) {
-        $http.post('http://127.0.0.1:5000/api/user/auth', {
+        $http.post(AppService.GetAPIServer() + '/api/user/auth', {
                 email: email,
                 password: password
             })
@@ -142,6 +142,10 @@ myapp.factory('AppService', ['$rootScope', function($rootScope) {
         return Math.round(d.getTime() / 1000);
     };
 
+    service.GetAPIServer = function() {
+        return "http://127.0.0.1:5000";
+    };
+
     return service;
 }]);
 
@@ -152,7 +156,7 @@ myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$localSt
     });
 
     $scope.get_current_user = function() {
-        $http.get('http://127.0.0.1:5000/api/user/' + $localStorage.user_id + '/profile').success(function(response) {
+        $http.get(AppService.GetAPIServer() + '/api/user/' + $localStorage.user_id + '/profile').success(function(response) {
             $rootScope.current_user = response
             $rootScope.current_user.user_id = $localStorage.user_id
             $scope.current_user = response
@@ -212,7 +216,7 @@ myapp.controller('UserRegisterController', ['$scope', '$rootScope', '$http', '$l
     }
 
     $scope.submit = function() {
-        $http.post('http://127.0.0.1:5000/api/user', {
+        $http.post(AppService.GetAPIServer() + '/api/user', {
                 email: $("#email").val(),
                 password: $("#password").val(),
                 first_name: $("#first_name").val(),
@@ -235,7 +239,7 @@ myapp.controller('UserRegisterController', ['$scope', '$rootScope', '$http', '$l
     };
 
     $scope.check_email_valid = function() {
-        $http.post('http://127.0.0.1:5000/api/user/check', {
+        $http.post(AppService.GetAPIServer() + '/api/user/check', {
                 email: $("#email").val()
             })
             .success(function(response) {
@@ -257,7 +261,7 @@ myapp.controller('ProductCategoryController', ['$scope', '$http', '$location', '
     $scope.categoryName = AppService.GetCategoryName($scope.categoryId);
 
     $scope.like = function(product) {
-        $http.put('http://127.0.0.1:5000/api/product/' + product.product_id + "/like").success(function(response) {
+        $http.put(AppService.GetAPIServer() + '/api/product/' + product.product_id + "/like").success(function(response) {
             if (!product.is_liked && response.liked) {
                 product.is_liked = 1;
                 product.likes = product.likes + 1;
@@ -268,7 +272,7 @@ myapp.controller('ProductCategoryController', ['$scope', '$http', '$location', '
         });
     };
 
-    $http.get('http://127.0.0.1:5000/api/product/category/' + $scope.categoryId).success(function(response) {
+    $http.get(AppService.GetAPIServer() + '/api/product/category/' + $scope.categoryId).success(function(response) {
         $scope.products_list = response
     });
 }]);
@@ -277,7 +281,7 @@ myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$
     $scope.productId = $route.current.params.product_id;
 
     $scope.like = function() {
-        $http.put('http://127.0.0.1:5000/api/product/' + $scope.productId + "/like").success(function(response) {
+        $http.put(AppService.GetAPIServer() + '/api/product/' + $scope.productId + "/like").success(function(response) {
             if (!$scope.product.is_liked && response.liked) {
                 $scope.product.is_liked = 1;
                 $scope.product.likes = $scope.product.likes + 1;
@@ -294,7 +298,7 @@ myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$
     };
 
     $scope.submit_comment = function() {
-        $http.post('http://127.0.0.1:5000/api/product/' + $scope.productId + '/comment', {
+        $http.post(AppService.GetAPIServer() + '/api/product/' + $scope.productId + '/comment', {
                 content: $("#new_comment").val()
             })
             .success(function(response) {
@@ -317,7 +321,7 @@ myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$
     }
 
     $scope.submit_response = function() {
-        $http.put('http://127.0.0.1:5000/api/comment/' + $scope.current_comment.comment_id, {
+        $http.put(AppService.GetAPIServer() + '/api/comment/' + $scope.current_comment.comment_id, {
                 response: $("#new_response").val()
             })
             .success(function(response) {
@@ -336,7 +340,7 @@ myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$
     };
 
     $scope.submit_bid = function() {
-        $http.post('http://127.0.0.1:5000/api/product/' + $scope.product.product_id + '/bid', {
+        $http.post(AppService.GetAPIServer() + '/api/product/' + $scope.product.product_id + '/bid', {
                 price: parseInt($("#bid_price").val())
             })
             .success(function(response) {
@@ -347,7 +351,7 @@ myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$
             });
     }
 
-    $http.get('http://127.0.0.1:5000/api/product/' + $scope.productId).success(function(response) {
+    $http.get(AppService.GetAPIServer() + '/api/product/' + $scope.productId).success(function(response) {
         $scope.product = response
         $scope.product.comment_count = $scope.product.comments.length;
         $scope.product.is_owner = $scope.product.seller.user_id == $rootScope.current_user.user_id;
@@ -364,7 +368,7 @@ myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$
 
 myapp.controller('ProductSellController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $location, $route, AuthService, AppService) {
     $scope.submit = function() {
-        $http.post('http://127.0.0.1:5000/api/product' , {
+        $http.post(AppService.GetAPIServer() + '/api/product' , {
                 name: $("#name").val(),
                 category: $("#category").val(),
                 description: $("#description").val(),
@@ -387,7 +391,7 @@ myapp.controller('ProductEditController', ['$scope', '$rootScope', '$http', '$lo
     $scope.productId = $route.current.params.product_id;
 
     $scope.save = function() {
-        $http.put('http://127.0.0.1:5000/api/product/' + $scope.productId, {
+        $http.put(AppService.GetAPIServer() + '/api/product/' + $scope.productId, {
                 name: $scope.product.name,
                 category: $scope.product.category,
                 description: $scope.product.description,
@@ -404,7 +408,7 @@ myapp.controller('ProductEditController', ['$scope', '$rootScope', '$http', '$lo
 
     $scope.category_list = $rootScope.category_list;
 
-    $http.get('http://127.0.0.1:5000/api/product/' + $scope.productId).success(function(response) {
+    $http.get(AppService.GetAPIServer() + '/api/product/' + $scope.productId).success(function(response) {
         $scope.product = response
         if ($scope.product.seller.user_id != $rootScope.current_user.user_id) {
             $location.path('/product/' + $scope.productId);
@@ -416,7 +420,7 @@ myapp.controller('ProductQueryController', ['$scope', '$http', '$location', '$ro
     $scope.keyword = $location.search().keyword
 
     $scope.like = function(product) {
-        $http.put('http://127.0.0.1:5000/api/product/' + product.product_id + "/like").success(function(response) {
+        $http.put(AppService.GetAPIServer() + '/api/product/' + product.product_id + "/like").success(function(response) {
             if (!product.is_liked && response.liked) {
                 product.is_liked = 1;
                 product.likes = product.likes + 1;
@@ -427,7 +431,7 @@ myapp.controller('ProductQueryController', ['$scope', '$http', '$location', '$ro
         });
     };
 
-    $http.get('http://127.0.0.1:5000/api/product/query?keyword=' + $scope.keyword).success(function(response) {
+    $http.get(AppService.GetAPIServer() + '/api/product/query?keyword=' + $scope.keyword).success(function(response) {
         $scope.products_list = response
     });
 }]);
@@ -436,7 +440,7 @@ myapp.controller('UserProfileController', ['$scope', '$rootScope', '$localStorag
     $scope.userId = $route.current.params.user_id;
 
     $scope.like = function(product) {
-        $http.put('http://127.0.0.1:5000/api/product/' + product.product_id + "/like").success(function(response) {
+        $http.put(AppService.GetAPIServer() + '/api/product/' + product.product_id + "/like").success(function(response) {
             if (!product.is_liked && response.liked) {
                 product.is_liked = 1;
                 product.likes = product.likes + 1;
@@ -448,7 +452,7 @@ myapp.controller('UserProfileController', ['$scope', '$rootScope', '$localStorag
     };
 
     $scope.follow = function(user) {
-        $http.put('http://127.0.0.1:5000/api/user/' + user.user_id + "/follow").success(function(response) {
+        $http.put(AppService.GetAPIServer() + '/api/user/' + user.user_id + "/follow").success(function(response) {
             if (!user.is_followed && response.followed) {
                 user.is_followed = 1;;
             } else if (user.is_followed && !response.followed) {
@@ -459,26 +463,26 @@ myapp.controller('UserProfileController', ['$scope', '$rootScope', '$localStorag
 
     $scope.is_me = $scope.userId == $localStorage.user_id;
 
-    $http.get('http://127.0.0.1:5000/api/user/' + $scope.userId + "/profile").success(function(response) {
+    $http.get(AppService.GetAPIServer() + '/api/user/' + $scope.userId + "/profile").success(function(response) {
         $scope.user = response
     });
 
-    $http.get('http://127.0.0.1:5000/api/user/' + $scope.userId + "/product").success(function(response) {
+    $http.get(AppService.GetAPIServer() + '/api/user/' + $scope.userId + "/product").success(function(response) {
         $scope.products_list = response
     });
 
-    $http.get('http://127.0.0.1:5000/api/user/' + $scope.userId + "/follower").success(function(response) {
+    $http.get(AppService.GetAPIServer() + '/api/user/' + $scope.userId + "/follower").success(function(response) {
         $scope.followers_list = response
     });
 
-    $http.get('http://127.0.0.1:5000/api/user/' + $scope.userId + "/following").success(function(response) {
+    $http.get(AppService.GetAPIServer() + '/api/user/' + $scope.userId + "/following").success(function(response) {
         $scope.followings_list = response
     });
 }]);
 
 myapp.controller('WantlistController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $location, $route, AuthService, AppService) {
     $scope.insert = function() {
-        $http.post('http://127.0.0.1:5000/api/wantlist', {
+        $http.post(AppService.GetAPIServer() + '/api/wantlist', {
                 name: $("#new_wantlist").val()
             })
             .success(function(response) {
@@ -499,7 +503,7 @@ myapp.controller('WantlistController', ['$scope', '$rootScope', '$http', '$locat
 
     $scope.save = function(wantlist) {
         wantlist.edit_mode = false;
-        $http.put('http://127.0.0.1:5000/api/wantlist/' + wantlist.wantlist_id, {
+        $http.put(AppService.GetAPIServer() + '/api/wantlist/' + wantlist.wantlist_id, {
                 name: wantlist.name
             })
             .success(function(response) {
@@ -510,7 +514,7 @@ myapp.controller('WantlistController', ['$scope', '$rootScope', '$http', '$locat
     };
 
     $scope.remove = function(wantlist) {
-        $http.delete('http://127.0.0.1:5000/api/wantlist/' + wantlist.wantlist_id)
+        $http.delete(AppService.GetAPIServer() + '/api/wantlist/' + wantlist.wantlist_id)
             .success(function(response) {
                 var index = $scope.wantlists_list.indexOf(wantlist);
                 $scope.wantlists_list.splice(index, 1);  
@@ -519,7 +523,7 @@ myapp.controller('WantlistController', ['$scope', '$rootScope', '$http', '$locat
             });
     };
 
-    $http.get('http://127.0.0.1:5000/api/wantlist').success(function(response) {
+    $http.get(AppService.GetAPIServer() + '/api/wantlist').success(function(response) {
         $scope.wantlists_list = response;
         for (var i = 0; i < $scope.wantlists_list.length; i++) {
             $scope.wantlists_list[i].edit_mode = false;
@@ -528,7 +532,7 @@ myapp.controller('WantlistController', ['$scope', '$rootScope', '$http', '$locat
 }]);
 
 myapp.controller('MyBidsController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
-    $http.get('http://127.0.0.1:5000/api/bid').success(function(response) {
+    $http.get(AppService.GetAPIServer() + '/api/bid').success(function(response) {
         $scope.bids_list = response
     });
 }]);
