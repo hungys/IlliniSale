@@ -1,3 +1,47 @@
 <div class="page-header">
   <h2>Register</h2>
 </div>
+
+<div class="row">
+    <div class="col-md-4 col-md-offset-4">
+        <div ng-hide="email_valid" class="alert alert-danger" role="alert">Oops! The email has been used.</div>
+        <form>
+            <div ng-class="{true:'form-group', false:'form-group has-error'}[email_valid]">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password">
+            </div>
+            <div class="form-group">
+                <label for="first_name">First Name</label>
+                <input class="form-control" id="first_name">
+            </div>
+            <div class="form-group">
+                <label for="last_name">Last Name</label>
+                <input class="form-control" id="last_name">
+            </div>
+            <div class="form-group">
+                <label for="nickname">Nickname</label>
+                <input class="form-control" id="nickname">
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select class="form-control" id="gender">
+                    <option value="0">Male</option>
+                    <option value="0">Female</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="mobile_phone">Mobile Phone</label>
+                <input type="tel" class="form-control" id="mobile_phone">
+            </div>
+            <div class="form-group">
+                <label for="birthday">Birthday</label>
+                <input type="date" class="form-control" id="birthday" placeholder="mm/dd/yyyy">
+            </div>
+            <button type="submit" class="btn btn-default" ng-click="submit()" ng-disabled="!email_valid">Submit</button>
+        </form>
+    </div>
+</div>

@@ -220,7 +220,28 @@ def register_user():
     g.db.commit()
 
     token = jwt.encode({"user_id": cur.lastrowid}, config.SERVER_SECRET, algorithm="HS256")
-    resp_body = {"token": token}
+    resp_body = {
+        "user_id": cur.lastrowid,
+        "token": token
+    }
+
+    resp = make_response(json.dumps(resp_body), 200)
+    resp.headers["Content-Type"] = "application/json"
+    return resp
+
+@user.route('/user/check', methods=['POST'])
+def check_email_valid():
+    try:
+        req_body = json.loads(request.data)
+    except:
+        abort(400)
+
+    cur = g.db.cursor()
+    cur.execute("SELECT UserId FROM User WHERE Email = %s", (str(req_body["email"]),))
+    user_data = cur.fetchone()
+
+    valid = user_data is None
+    resp_body = {"valid": valid}
 
     resp = make_response(json.dumps(resp_body), 200)
     resp.headers["Content-Type"] = "application/json"

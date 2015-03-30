@@ -198,8 +198,50 @@ myapp.controller('UserLoginController', ['$scope', '$http', '$location', '$route
     };
 }]);
 
-myapp.controller('UserRegisterController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
+myapp.controller('UserRegisterController', ['$scope', '$rootScope', '$http', '$localStorage', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $localStorage, $location, $route, AuthService, AppService) {
+    if (AuthService.IsLoggedIn()) {
+        $location.path('/');
+    }
 
+    $scope.submit = function() {
+        $http.post('http://127.0.0.1:5000/api/user', {
+                email: $("#email").val(),
+                password: $("#password").val(),
+                first_name: $("#first_name").val(),
+                last_name: $("#last_name").val(),
+                nickname: $("#nickname").val(),
+                gender: $("#gender").val(),
+                mobile_phone: $("#mobile_phone").val(),
+                birthday: $("#birthday").val()
+            })
+            .success(function(response) {
+                $localStorage.user_id = response.user_id
+                $localStorage.token = response.token
+                $rootScope.$broadcast("auth_changed");
+                alertify.success("Your are now logged in.");
+                $route.reload()
+                $location.path('/');
+            }).error(function(data, status, headers, config) {
+                alertify.error("Fail to register, try again later!");
+            });
+    };
+
+    $scope.check_email_valid = function() {
+        $http.post('http://127.0.0.1:5000/api/user/check', {
+                email: $("#email").val()
+            })
+            .success(function(response) {
+                $scope.email_valid = response.valid;
+            }).error(function(data, status, headers, config) {
+                $scope.email_valid = false;
+            });
+    };
+
+    $scope.email_valid = true;
+
+    $('#email').blur(function() {
+        $scope.check_email_valid();
+    });
 }]);
 
 myapp.controller('ProductCategoryController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
