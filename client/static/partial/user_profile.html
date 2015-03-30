@@ -31,7 +31,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4 text-center">
+                    <div class="col-md-4 text-center" ng-hide="is_me">
                         <br/>
                         <button ng-hide="user.is_followed" type="button" class="btn btn-default" ng-click="follow(user)">Follow</button>
                         <button ng-show="user.is_followed" type="button" class="btn btn-primary" ng-click="follow(user)">Unfollow</button>

@@ -50,6 +50,10 @@ var myapp = angular.module('myApp', ['ngStorage', 'ngRoute'])
             .when('/wantlist', {
                 templateUrl: 'static/partial/wantlist.html',
                 controller: 'WantlistController'
+            })
+            .when('/mybids', {
+                templateUrl: 'static/partial/my_bids.html',
+                controller: 'MyBidsController'
             });
     })
     .run(function($rootScope) {
@@ -327,6 +331,18 @@ myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$
             });
     };
 
+    $scope.submit_bid = function() {
+        $http.post('http://127.0.0.1:5000/api/product/' + $scope.product.product_id + '/bid', {
+                price: parseInt($("#bid_price").val())
+            })
+            .success(function(response) {
+                $("#bid_price").val("");
+                alertify.success("Your bid request has been submitted.");
+            }).error(function(data, status, headers, config) {
+                alertify.error("Fail to submit, try again later!");
+            });
+    }
+
     $http.get('http://127.0.0.1:5000/api/product/' + $scope.productId).success(function(response) {
         $scope.product = response
         $scope.product.comment_count = $scope.product.comments.length;
@@ -383,7 +399,7 @@ myapp.controller('ProductQueryController', ['$scope', '$http', '$location', '$ro
     });
 }]);
 
-myapp.controller('UserProfileController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
+myapp.controller('UserProfileController', ['$scope', '$rootScope', '$localStorage', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $localStorage, $http, $location, $route, AuthService, AppService) {
     $scope.userId = $route.current.params.user_id;
 
     $scope.like = function(product) {
@@ -407,6 +423,8 @@ myapp.controller('UserProfileController', ['$scope', '$http', '$location', '$rou
             }
         });
     };
+
+    $scope.is_me = $scope.userId == $localStorage.user_id;
 
     $http.get('http://127.0.0.1:5000/api/user/' + $scope.userId + "/profile").success(function(response) {
         $scope.user = response
@@ -473,5 +491,11 @@ myapp.controller('WantlistController', ['$scope', '$rootScope', '$http', '$locat
         for (var i = 0; i < $scope.wantlists_list.length; i++) {
             $scope.wantlists_list[i].edit_mode = false;
         }
+    });
+}]);
+
+myapp.controller('MyBidsController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
+    $http.get('http://127.0.0.1:5000/api/bid').success(function(response) {
+        $scope.bids_list = response
     });
 }]);

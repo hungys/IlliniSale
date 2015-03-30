@@ -227,8 +227,8 @@ def bid_product(product_id):
     if product_data is None:
         abort(404)
 
-    cur.execute("INSERT INTO Bid(UserId, ProductId, Price) VALUES(%s, %s, \
-        %s)", (str(g.user_id), str(product_id), str(req_body["price"])))
+    cur.execute("INSERT INTO Bid(UserId, ProductId, Price, Status) VALUES(%s, %s, \
+        %s, 'new')", (str(g.user_id), str(product_id), str(req_body["price"])))
 
     g.db.commit()
 

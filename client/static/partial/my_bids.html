@@ -1,0 +1,47 @@
+<div class="page-header">
+    <h2>My Bids</h2>
+</div>
+
+<h3>Sells</h3>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Bidder</th>
+            <th>Posted Price</th>
+            <th>Requested Price</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="bid in bids_list.sells">
+            <td><a href="#/product/{{bid.product.id}}">{{bid.product.name}}</a></td>
+            <td><a href="#/user/{{bid.bidder.user_id}}">{{bid.bidder.nickname}}</a></td>
+            <td>${{bid.product.price}}</td>
+            <td>${{bid.price}}</td>
+            <td>{{bid.status}}</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Bids</h3>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Posted Price</th>
+            <th>Desired Price</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="bid in bids_list.bids">
+            <td><a href="#/product/{{bid.product.id}}">{{bid.product.name}}</a></td>
+            <td>${{bid.product.price}}</td>
+            <td>${{bid.price}}</td>
+            <td>{{bid.status}}</td>
+        </tr>
+    </tbody>
+</table>

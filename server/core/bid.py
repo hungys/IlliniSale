@@ -24,13 +24,13 @@ def get_my_bids():
                 "id": bid_data[1],
                 "name": bid_data[5],
                 "price": bid_data[6]
-            },
-            "bidder_user_id": g.user_id
+            }
         })
 
     cur.execute("SELECT Bid.BidId, Bid.UserId, Bid.ProductId, Bid.Price, Bid.Status, \
-        unix_timestamp(Bid.CreateAt), Product.Name, Product.Price FROM Bid, Product \
-        WHERE Bid.ProductId = Product.ProductId AND Product.UserId = %s", str(g.user_id))
+        unix_timestamp(Bid.CreateAt), Product.Name, Product.Price, User.Nickname FROM Bid, Product, User \
+        WHERE Bid.ProductId = Product.ProductId AND Product.UserId = %s \
+        AND User.UserId = Bid.UserId", str(g.user_id))
     sells_data = cur.fetchall()
 
     my_sells = []
@@ -45,7 +45,10 @@ def get_my_bids():
                 "name": sell_data[6],
                 "price": sell_data[7]
             },
-            "bidder_user_id": sell_data[1]
+            "bidder": {
+                "user_id": sell_data[1],
+                "nickname": sell_data[8]
+            }
         })
 
     resp_body = {
