@@ -398,6 +398,16 @@ myapp.controller('UserProfileController', ['$scope', '$http', '$location', '$rou
         });
     };
 
+    $scope.follow = function(user) {
+        $http.put('http://127.0.0.1:5000/api/user/' + user.user_id + "/follow").success(function(response) {
+            if (!user.is_followed && response.followed) {
+                user.is_followed = 1;;
+            } else if (user.is_followed && !response.followed) {
+                user.is_followed = 0;
+            }
+        });
+    };
+
     $http.get('http://127.0.0.1:5000/api/user/' + $scope.userId + "/profile").success(function(response) {
         $scope.user = response
     });

@@ -17,6 +17,12 @@ def get_user_profile(user_id):
     if user_data is None:
         abort(404)
 
+    if g.user_id is None:
+        is_followed = 0
+    else:
+        cur.execute("SELECT COUNT(*) FROM Follow WHERE FollowerUserId = %s AND FollowingUserId = %s", (str(g.user_id), str(user_id)))
+        is_followed = cur.fetchone()[0]
+
     cur.execute("SELECT COUNT(ProductId) FROM Product WHERE UserId = %s", str(user_id))
     product_count = cur.fetchone()[0]
 
@@ -40,7 +46,8 @@ def get_user_profile(user_id):
         "register_time": user_data[5],
         "product_count": product_count,
         "follower_count": follower_count,
-        "following_count": following_count
+        "following_count": following_count,
+        "is_followed": is_followed
     }
 
     resp = make_response(json.dumps(resp_body), 200)
@@ -50,12 +57,21 @@ def get_user_profile(user_id):
 @user.route('/user/<int:user_id>/follower', methods=['GET'])
 def get_user_follower(user_id):
     cur = g.db.cursor()
-    cur.execute("SELECT User.UserId, User.Nickname, User.FirstName, User.LastName, \
-        User.ProfilePic, User.Gender, \
-        (SELECT COUNT(*) FROM Product WHERE Product.UserId = F1.FollowerUserId), \
-        (SELECT COUNT(*) FROM Follow F2 WHERE F2.FollowingUserId = F1.FollowerUserId) \
-        FROM User, Follow F1 WHERE F1.FollowingUserId = %s AND \
-        User.UserId = F1.FollowerUserId", str(user_id))
+    if g.user_id is None:
+        cur.execute("SELECT User.UserId, User.Nickname, User.FirstName, User.LastName, \
+            User.ProfilePic, User.Gender, \
+            (SELECT COUNT(*) FROM Product WHERE Product.UserId = F1.FollowerUserId), \
+            (SELECT COUNT(*) FROM Follow F2 WHERE F2.FollowingUserId = F1.FollowerUserId), 0 \
+            FROM User, Follow F1 WHERE F1.FollowingUserId = %s AND \
+            User.UserId = F1.FollowerUserId", str(user_id))
+    else:
+        cur.execute("SELECT User.UserId, User.Nickname, User.FirstName, User.LastName, \
+            User.ProfilePic, User.Gender, \
+            (SELECT COUNT(*) FROM Product WHERE Product.UserId = F1.FollowerUserId), \
+            (SELECT COUNT(*) FROM Follow F2 WHERE F2.FollowingUserId = F1.FollowerUserId), \
+            (SELECT COUNT(*) FROM Follow F3 WHERE F3.FollowingUserId = F1.FollowerUserId AND F3.FollowerUserId = %s)\
+            FROM User, Follow F1 WHERE F1.FollowingUserId = %s AND \
+            User.UserId = F1.FollowerUserId", (str(g.user_id), str(user_id)))
     followers_data = cur.fetchall()
 
     resp_body = []
@@ -68,7 +84,8 @@ def get_user_follower(user_id):
             "profile_pic": follower_data[4],
             "gender": bool(follower_data[5]),
             "product_count": follower_data[6],
-            "follower_count": follower_data[7]
+            "follower_count": follower_data[7],
+            "is_followed": follower_data[8]
         })
 
     resp = make_response(json.dumps(resp_body), 200)
@@ -78,12 +95,21 @@ def get_user_follower(user_id):
 @user.route('/user/<int:user_id>/following', methods=['GET'])
 def get_user_following(user_id):
     cur = g.db.cursor()
-    cur.execute("SELECT User.UserId, User.Nickname, User.FirstName, User.LastName, \
-        User.ProfilePic, User.Gender, \
-        (SELECT COUNT(*) FROM Product WHERE Product.UserId = F1.FollowingUserId), \
-        (SELECT COUNT(*) FROM Follow F2 WHERE F2.FollowingUserId = F1.FollowingUserId) \
-        FROM User, Follow F1 WHERE F1.FollowerUserId = %s AND \
-        User.UserId = F1.FollowingUserId", str(user_id))
+    if g.user_id is None:
+        cur.execute("SELECT User.UserId, User.Nickname, User.FirstName, User.LastName, \
+            User.ProfilePic, User.Gender, \
+            (SELECT COUNT(*) FROM Product WHERE Product.UserId = F1.FollowingUserId), \
+            (SELECT COUNT(*) FROM Follow F2 WHERE F2.FollowingUserId = F1.FollowingUserId), 0 \
+            FROM User, Follow F1 WHERE F1.FollowerUserId = %s AND \
+            User.UserId = F1.FollowingUserId", str(user_id))
+    else:
+        cur.execute("SELECT User.UserId, User.Nickname, User.FirstName, User.LastName, \
+            User.ProfilePic, User.Gender, \
+            (SELECT COUNT(*) FROM Product WHERE Product.UserId = F1.FollowingUserId), \
+            (SELECT COUNT(*) FROM Follow F2 WHERE F2.FollowingUserId = F1.FollowingUserId), \
+            (SELECT COUNT(*) FROM Follow F3 WHERE F3.FollowingUserId = F1.FollowingUserId AND F3.FollowerUserId = %s) \
+            FROM User, Follow F1 WHERE F1.FollowerUserId = %s AND \
+            User.UserId = F1.FollowingUserId", (str(g.user_id), str(user_id)))
     followings_data = cur.fetchall()
 
     resp_body = []
@@ -96,7 +122,8 @@ def get_user_following(user_id):
             "profile_pic": following_data[4],
             "gender": bool(following_data[5]),
             "product_count": following_data[6],
-            "follower_count": following_data[7]
+            "follower_count": following_data[7],
+            "is_followed": following_data[8]
         })
 
     resp = make_response(json.dumps(resp_body), 200)

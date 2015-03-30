@@ -33,7 +33,8 @@
                 <div class="row">
                     <div class="col-md-4 text-center">
                         <br/>
-                        <button type="button" class="btn btn-primary">Follow</button>
+                        <button ng-hide="user.is_followed" type="button" class="btn btn-default" ng-click="follow(user)">Follow</button>
+                        <button ng-show="user.is_followed" type="button" class="btn btn-primary" ng-click="follow(user)">Unfollow</button>
                     </div>
                 </div>
             </div>
@@ -78,7 +79,7 @@
                                 <div class="caption text-center">
                                     <strong><a href="#/user/{{follower.user_id}}">{{follower.nickname}}</a></strong>
                                     <p>{{follower.product_count}} products · {{follower.follower_count}} followers</p>
-                                    <p><button type="button" class="btn btn-default btn-block">Follow</button></p>
+                                    <p><button ng-hide="follower.is_followed" type="button" class="btn btn-default btn-block" ng-click="follow(follower)">Follow</button><button ng-show="follower.is_followed" type="button" class="btn btn-primary btn-block" ng-click="follow(follower)">Unfollow</button></p>
                                 </div>
                         </div>
                     </div>
@@ -91,7 +92,7 @@
                                 <div class="caption text-center">
                                     <strong><a href="#/user/{{following.user_id}}">{{following.nickname}}</a></strong>
                                     <p>{{following.product_count}} products · {{following.follower_count}} followers</p>
-                                    <p><button type="button" class="btn btn-default btn-block">Follow</button></p>
+                                    <p><button ng-hide="following.is_followed" type="button" class="btn btn-default btn-block" ng-click="follow(following)">Follow</button><button ng-show="following.is_followed" type="button" class="btn btn-primary btn-block" ng-click="follow(following)">Unfollow</button></p>
                                 </div>
                         </div>
                     </div>
