@@ -144,6 +144,7 @@ myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$localSt
             $rootScope.current_user = response
             $rootScope.current_user.user_id = $localStorage.user_id
             $scope.current_user = response
+            $scope.current_user.user_id = $localStorage.user_id
         });
     };
 
@@ -233,6 +234,11 @@ myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$
         });
     };
 
+    $scope.respond = function(comment) {
+        $scope.current_comment = comment;
+        $("#new_response").val(comment.response);
+    };
+
     $scope.submit_comment = function() {
         $http.post('http://127.0.0.1:5000/api/product/' + $scope.productId + '/comment', {
                 content: $("#new_comment").val()
@@ -249,15 +255,44 @@ myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$
                     user_nickname: $rootScope.current_user.nickname
                 });
                 $scope.product.comment_count = $scope.product.comment_count + 1;
+                $("#new_comment").val("");
                 alertify.success("Your comment has been posted.");
             }).error(function(data, status, headers, config) {
                 alertify.error("Fail to submit, try again later!");
             });
     }
 
+    $scope.submit_response = function() {
+        $http.put('http://127.0.0.1:5000/api/comment/' + $scope.current_comment.comment_id, {
+                response: $("#new_response").val()
+            })
+            .success(function(response) {
+                for (var i = 0; i < $scope.product.comments.length; i++) {
+                    if ($scope.product.comments[i].comment_id == $scope.current_comment.comment_id) {
+                        $scope.product.comments[i].response = $("#new_response").val();
+                        $scope.product.comments[i].response_time = AppService.GetCurrentTime();
+                        $scope.product.comments[i].is_responded = $("#new_response").val() != "";
+                    }
+                }
+                $("#new_response").val("");
+                alertify.success("Your response has been saved.");
+            }).error(function(data, status, headers, config) {
+                alertify.error("Fail to submit, try again later!");
+            });
+    };
+
     $http.get('http://127.0.0.1:5000/api/product/' + $scope.productId).success(function(response) {
         $scope.product = response
         $scope.product.comment_count = $scope.product.comments.length;
+        $scope.product.is_owner = $scope.product.seller.user_id == $rootScope.current_user.user_id;
+
+        for (var i = 0; i < $scope.product.comments.length; i++) {
+            if ($scope.product.comments[i].response != null && $scope.product.comments[i].response != "") {
+                $scope.product.comments[i].is_responded = true;
+            } else {
+                $scope.product.comments[i].is_responded = false;
+            }
+        }
     });
 }]);
 
@@ -304,6 +339,18 @@ myapp.controller('ProductQueryController', ['$scope', '$http', '$location', '$ro
 
 myapp.controller('UserProfileController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
     $scope.userId = $route.current.params.user_id;
+
+    $scope.like = function(product) {
+        $http.put('http://127.0.0.1:5000/api/product/' + product.product_id + "/like").success(function(response) {
+            if (!product.is_liked && response.liked) {
+                product.is_liked = 1;
+                product.likes = product.likes + 1;
+            } else if (product.is_liked && !response.liked) {
+                product.is_liked = 0;
+                product.likes = product.likes - 1;
+            }
+        });
+    };
 
     $http.get('http://127.0.0.1:5000/api/user/' + $scope.userId + "/profile").success(function(response) {
         $scope.user = response

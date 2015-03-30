@@ -11,7 +11,7 @@ def respond_to_comment(comment_id):
     cur = g.db.cursor()
     cur.execute("SELECT Comment.CommentId, Product.UserId FROM Comment, Product \
         WHERE Comment.CommentId = %s AND Comment.ProductId = \
-        Product.ProductId", str(comment_id))
+        Product.ProductId", (str(comment_id),))
     comment_data = cur.fetchone()
 
     if comment_data is None:
