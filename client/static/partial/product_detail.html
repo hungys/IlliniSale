@@ -28,9 +28,9 @@
                 <h3><div class="dropdown">{{product.name}} <button type="button" class="btn btn-default dropdown-toggle" id="btn_manage" data-toggle="dropdown" aria-expanded="true" ng-show="product.is_owner">
   <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
 </button><ul class="dropdown-menu" role="menu" aria-labelledby="btn_manage">
-    <li role="presentation"><a role="menuitem" tabindex="-1" href="">Edit</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="#/product/{{product.product_id}}/edit">Edit</a></li>
     <li role="presentation"><a role="menuitem" tabindex="-1" href="">Mark as sold</a></li>
-    <li role="presentation"><a role="menuitem" tabindex="-1" href="">Delete</a></li>
+    <!-- <li role="presentation"><a role="menuitem" tabindex="-1" href="">Delete</a></li> -->
   </ul></div></h3>
                 <p><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <a href="#/user/{{product.seller.user_id}}">{{product.seller.nickname}}</a></p>
                 <p><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> ${{product.price}}</p>

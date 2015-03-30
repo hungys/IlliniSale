@@ -39,6 +39,10 @@ var myapp = angular.module('myApp', ['ngStorage', 'ngRoute'])
                 templateUrl: 'static/partial/product_query.html',
                 controller: 'ProductQueryController'
             })
+            .when('/product/:product_id/edit', {
+                templateUrl: 'static/partial/product_edit.html',
+                controller: 'ProductEditController'
+            })
             .when('/product/:product_id', {
                 templateUrl: 'static/partial/product_detail.html',
                 controller: 'ProductDetailController'
@@ -360,7 +364,7 @@ myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$
 
 myapp.controller('ProductSellController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $location, $route, AuthService, AppService) {
     $scope.submit = function() {
-        $http.post('http://127.0.0.1:5000/api/product', {
+        $http.post('http://127.0.0.1:5000/api/product' , {
                 name: $("#name").val(),
                 category: $("#category").val(),
                 description: $("#description").val(),
@@ -377,6 +381,35 @@ myapp.controller('ProductSellController', ['$scope', '$rootScope', '$http', '$lo
     };
 
     $scope.category_list = $rootScope.category_list;
+}]);
+
+myapp.controller('ProductEditController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $location, $route, AuthService, AppService) {
+    $scope.productId = $route.current.params.product_id;
+
+    $scope.save = function() {
+        $http.put('http://127.0.0.1:5000/api/product/' + $scope.productId, {
+                name: $scope.product.name,
+                category: $scope.product.category,
+                description: $scope.product.description,
+                price: parseInt($scope.product.price),
+                location: $scope.product.location
+            })
+            .success(function(response) {
+                alertify.success("Your edit has been saved.");
+                $location.path('/product/' + $scope.productId);
+            }).error(function(data, status, headers, config) {
+                alertify.error("Fail to save, try again later!");
+            });
+    };
+
+    $scope.category_list = $rootScope.category_list;
+
+    $http.get('http://127.0.0.1:5000/api/product/' + $scope.productId).success(function(response) {
+        $scope.product = response
+        if ($scope.product.seller.user_id != $rootScope.current_user.user_id) {
+            $location.path('/product/' + $scope.productId);
+        }
+    });
 }]);
 
 myapp.controller('ProductQueryController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {

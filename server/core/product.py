@@ -216,6 +216,37 @@ def post_product():
     resp.headers["Content-Type"] = "application/json"
     return resp
 
+@product.route('/product/<int:product_id>', methods=['PUT'])
+@auth.login_required
+def edit_product(product_id):
+    try:
+        req_body = json.loads(request.data)
+    except:
+        abort(400)
+
+    cur = g.db.cursor()
+    cur.execute("SELECT Name, Category, Description, Price, Location \
+        FROM Product WHERE UserId = %s AND ProductId = %s", (str(g.user_id), str(product_id)))
+    product_data = cur.fetchone()
+
+    if product_data is None:
+        abort(404)
+
+    name = req_body["name"] if "name" in req_body else user_data[0]
+    category = req_body["category"] if "category" in req_body else user_data[1]
+    description = req_body["description"] if "description" in req_body else user_data[2]
+    price = req_body["price"] if "price" in req_body else user_data[3]
+    location = req_body["location"] if "location" in req_body else user_data[4]
+
+    cur.execute("UPDATE Product SET Name = %s, Category = %s, Description = %s, \
+        Price = %s, Location = %s \
+        WHERE ProductId = %s", (name, category, description, price, 
+            location, str(product_id)))
+
+    g.db.commit()
+
+    return '', 200
+
 @product.route('/product/<int:product_id>/bid', methods=['POST'])
 @auth.login_required
 def bid_product(product_id):
