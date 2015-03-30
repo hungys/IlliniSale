@@ -61,6 +61,7 @@ def get_user_follower(user_id):
     resp_body = []
     for follower_data in followers_data:
         resp_body.append({
+            "user_id": follower_data[0],
             "nickname": follower_data[1],
             "first_name": follower_data[2],
             "last_name": follower_data[3],
