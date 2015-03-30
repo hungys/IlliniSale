@@ -46,6 +46,10 @@ var myapp = angular.module('myApp', ['ngStorage', 'ngRoute'])
             .when('/user/:user_id', {
                 templateUrl: 'static/partial/user_profile.html',
                 controller: 'UserProfileController'
+            })
+            .when('/wantlist', {
+                templateUrl: 'static/partial/wantlist.html',
+                controller: 'WantlistController'
             });
     })
     .run(function($rootScope) {
@@ -366,5 +370,56 @@ myapp.controller('UserProfileController', ['$scope', '$http', '$location', '$rou
 
     $http.get('http://127.0.0.1:5000/api/user/' + $scope.userId + "/following").success(function(response) {
         $scope.followings_list = response
+    });
+}]);
+
+myapp.controller('WantlistController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $location, $route, AuthService, AppService) {
+    $scope.insert = function() {
+        $http.post('http://127.0.0.1:5000/api/wantlist', {
+                name: $("#new_wantlist").val()
+            })
+            .success(function(response) {
+                $scope.wantlists_list.splice(0, 0, {
+                    create_time: AppService.GetCurrentTime(),
+                    name: $("#new_wantlist").val(),
+                    wantlist_id: response.wantlist_id
+                });
+                $("#new_wantlist").val("");
+            }).error(function(data, status, headers, config) {
+                alertify.error("Fail to submit, try again later!");
+            });
+    };
+
+    $scope.enter_edit_mode = function(wantlist) {
+        wantlist.edit_mode = true;
+    };
+
+    $scope.save = function(wantlist) {
+        wantlist.edit_mode = false;
+        $http.put('http://127.0.0.1:5000/api/wantlist/' + wantlist.wantlist_id, {
+                name: wantlist.name
+            })
+            .success(function(response) {
+                alertify.success("Your change has been saved.");
+            }).error(function(data, status, headers, config) {
+                alertify.error("Fail to save, try again later!");
+            });
+    };
+
+    $scope.remove = function(wantlist) {
+        $http.delete('http://127.0.0.1:5000/api/wantlist/' + wantlist.wantlist_id)
+            .success(function(response) {
+                var index = $scope.wantlists_list.indexOf(wantlist);
+                $scope.wantlists_list.splice(index, 1);  
+            }).error(function(data, status, headers, config) {
+                alertify.error("Fail to remove, try again later!");
+            });
+    };
+
+    $http.get('http://127.0.0.1:5000/api/wantlist').success(function(response) {
+        $scope.wantlists_list = response;
+        for (var i = 0; i < $scope.wantlists_list.length; i++) {
+            $scope.wantlists_list[i].edit_mode = false;
+        }
     });
 }]);

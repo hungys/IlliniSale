@@ -1,0 +1,45 @@
+<div class="page-header">
+    <h2>My Wantlist</h2>
+</div>
+
+<div class="row" ng-repeat="wantlist in wantlists_list">
+    <form>
+        <div class="col-md-3 col-md-offset-4">
+            <div class="form-group">
+                <p ng-hide="wantlist.edit_mode">{{wantlist.name}}</p>
+                <input ng-show="wantlist.edit_mode" class="form-control" ng-model="wantlist.name">
+            </div>
+        </div>
+        <div class="col-md-1">
+            <div class="form-group">
+                <div class="dropdown">
+                    <button type="button" class="btn btn-default dropdown-toggle" id="btn_manage" data-toggle="dropdown" aria-expanded="true" ng-hide="wantlist.edit_mode">
+                        <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="btn_manage">
+                        <li role="presentation" ng-click="enter_edit_mode(wantlist)"><a role="menuitem" tabindex="-1" href="">Edit</a></li>
+                        <li role="presentation" ng-click="remove(wantlist)"><a role="menuitem" tabindex="-1" href="">Delete</a></li>
+                    </ul>
+                </div>
+                <button ng-click="save(wantlist)" ng-show="wantlist.edit_mode" type="button" class="btn btn-info" aria-label="Save">
+                    <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="row">
+    <form>
+        <div class="col-md-3 col-md-offset-4">
+            <div class="form-group">
+                <input class="form-control" id="new_wantlist" placeholder="Enter what you need...">
+            </div>
+        </div>
+        <div class="col-md-1">
+            <button type="button" class="btn btn-danger" aria-label="Left Align" ng-click="insert()">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            </button>
+        </div>
+    </form>
+</div>

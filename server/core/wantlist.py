@@ -9,7 +9,7 @@ wantlist = Blueprint("wantlist", __name__)
 def get_my_wantlist():
     cur = g.db.cursor()
     cur.execute("SELECT WantlistId, Name, unix_timestamp(CreateAt) FROM Wantlist \
-        WHERE UserId = %s", str(g.user_id))
+        WHERE UserId = %s ORDER BY CreateAt DESC", str(g.user_id))
     wantlists_data = cur.fetchall()
 
     resp_body = []
