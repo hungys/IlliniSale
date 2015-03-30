@@ -86,7 +86,7 @@ var myapp = angular.module('myApp', ['ngStorage', 'ngRoute'])
         ];
     });
 
-myapp.factory('AuthService', ['$http', '$rootScope', '$localStorage', function($http, $rootScope, $localStorage) {
+myapp.factory('AuthService', ['$http', '$rootScope', '$localStorage', 'AppService', function($http, $rootScope, $localStorage, AppService) {
     var service = {};
 
     service.Login = function(email, password, success_callback, error_callback) {
