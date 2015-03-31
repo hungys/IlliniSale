@@ -80,7 +80,7 @@ def get_product(product_id):
         unix_timestamp(Comment.CreateAt), unix_timestamp(Comment.UpdateAt), \
         User.Nickname, User.ProfilePic FROM Comment, User WHERE \
         Comment.ProductId = %s AND Comment.UserId = User.UserId \
-        ORDER BY Comment.CreateAt DESC", str(product_id))
+        ORDER BY Comment.CreateAt DESC", (str(product_id),))
     comments_data = cur.fetchall()
     product_comments = []
     for comment_data in comments_data:
@@ -95,7 +95,7 @@ def get_product(product_id):
             "user_profile_pic": comment_data[7]
         })
 
-    cur.execute("SELECT FileName FROM Photo WHERE ProductId = %s", str(product_id))
+    cur.execute("SELECT FileName FROM Photo WHERE ProductId = %s", (str(product_id),))
     photos_data = cur.fetchall()
     product_photos = []
     for photo_data in photos_data:
