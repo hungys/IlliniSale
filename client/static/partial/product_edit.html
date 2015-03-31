@@ -7,7 +7,7 @@
         <form>
             <div class="form-group">
                 <label for="name">Item name</label>
-                <input class="form-control" id="name" ng-model="product.name">
+                <input type="text" maxlength="100" class="form-control" id="name" ng-model="product.name">
             </div>
             <div class="form-group">
                 <label for="category">Category</label>
@@ -19,16 +19,16 @@
                 <label for="price">Price</label>
                 <div class="input-group">
                   <div class="input-group-addon">$</div>
-                  <input type="text" class="form-control" id="price" ng-model="product.price">
+                  <input type="number" class="form-control" id="price" ng-model="product.price" min="0">
                 </div>
             </div>
             <div class="form-group">
                 <label for="location">Location</label>
-                <input class="form-control" id="location" ng-model="product.location">
+                <input type="text" maxlength="150" class="form-control" id="location" ng-model="product.location">
             </div>
             <div class="form-group">
                 <label for="description">Description</label>
-                <textarea class="form-control" rows="3" id="description" ng-model="product.description"></textarea>
+                <textarea maxlength="1000" class="form-control" rows="3" id="description" ng-model="product.description"></textarea>
             </div>
             <button type="submit" class="btn btn-default" ng-click="save()">Save</button>
         </form>
