@@ -3,11 +3,11 @@
 </div>
 
 <div class="row" ng-repeat="wantlist in wantlists_list">
-    <form>
+    <form ng-submit="save(wantlist)">
         <div class="col-md-3 col-md-offset-4">
             <div class="form-group">
                 <p ng-hide="wantlist.edit_mode">{{wantlist.name}}</p>
-                <input ng-show="wantlist.edit_mode" class="form-control" ng-model="wantlist.name">
+                <input maxlength="30" ng-show="wantlist.edit_mode" class="form-control" ng-model="wantlist.name" required>
             </div>
         </div>
         <div class="col-md-1">
@@ -21,7 +21,7 @@
                         <li role="presentation" ng-click="remove(wantlist)"><a role="menuitem" tabindex="-1" href="">Delete</a></li>
                     </ul>
                 </div>
-                <button ng-click="save(wantlist)" ng-show="wantlist.edit_mode" type="button" class="btn btn-info" aria-label="Save">
+                <button ng-show="wantlist.edit_mode" type="submit" class="btn btn-info" aria-label="Save">
                     <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
                 </button>
             </div>
@@ -30,14 +30,14 @@
 </div>
 
 <div class="row">
-    <form>
+    <form ng-submit="insert()">
         <div class="col-md-3 col-md-offset-4">
             <div class="form-group">
-                <input class="form-control" id="new_wantlist" placeholder="Enter what you need...">
+                <input maxlength="30" class="form-control" id="new_wantlist" placeholder="Enter what you need..." required>
             </div>
         </div>
         <div class="col-md-1">
-            <button type="button" class="btn btn-danger" aria-label="Left Align" ng-click="insert()">
+            <button type="submit" class="btn btn-danger" aria-label="Left Align">
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
             </button>
         </div>

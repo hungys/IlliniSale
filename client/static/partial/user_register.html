@@ -5,26 +5,26 @@
 <div class="row">
     <div class="col-md-4 col-md-offset-4">
         <div ng-hide="email_valid" class="alert alert-danger" role="alert">Oops! The email has been used.</div>
-        <form>
+        <form ng-submit="submit()">
             <div ng-class="{true:'form-group', false:'form-group has-error'}[email_valid]">
                 <label for="email">Email</label>
-                <input type="email" class="form-control" id="email">
+                <input type="email" maxlength="100" class="form-control" id="email" required>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" class="form-control" id="password">
+                <input type="password" class="form-control" id="password" required>
             </div>
             <div class="form-group">
                 <label for="first_name">First Name</label>
-                <input class="form-control" id="first_name">
+                <input maxlength="30" class="form-control" id="first_name" required>
             </div>
             <div class="form-group">
                 <label for="last_name">Last Name</label>
-                <input class="form-control" id="last_name">
+                <input maxlength="30" class="form-control" id="last_name" required>
             </div>
             <div class="form-group">
                 <label for="nickname">Nickname</label>
-                <input class="form-control" id="nickname">
+                <input maxlength="30" class="form-control" id="nickname" required>
             </div>
             <div class="form-group">
                 <label for="gender">Gender</label>
@@ -35,13 +35,13 @@
             </div>
             <div class="form-group">
                 <label for="mobile_phone">Mobile Phone</label>
-                <input type="tel" class="form-control" id="mobile_phone">
+                <input type="tel" maxlength="15" class="form-control" id="mobile_phone" required>
             </div>
             <div class="form-group">
                 <label for="birthday">Birthday</label>
-                <input type="date" class="form-control" id="birthday" placeholder="mm/dd/yyyy">
+                <input type="date" class="form-control" id="birthday" placeholder="mm/dd/yyyy" required>
             </div>
-            <button type="submit" class="btn btn-default" ng-click="submit()" ng-disabled="!email_valid">Submit</button>
+            <button type="submit" class="btn btn-default" ng-disabled="!email_valid">Submit</button>
         </form>
     </div>
 </div>

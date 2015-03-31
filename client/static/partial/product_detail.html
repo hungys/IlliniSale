@@ -100,11 +100,11 @@
                                 <p class="comment-response" ng-show="comment.is_responded"><strong>Seller:</strong> {{comment.response}}</p>
                                 <hr>
                             </div>
-                            <form>
+                            <form ng-submit="submit_comment()">
                                 <div class="form-group">
-                                    <textarea class="form-control" rows="3" id="new_comment" placeholder="Write a public comment..."></textarea>
+                                    <textarea maxlength="500" class="form-control" rows="3" id="new_comment" placeholder="Write a public comment..." required></textarea>
                                 </div>
-                                <button type="submit" class="btn btn-default" ng-click="submit_comment()">Submit</button>
+                                <button type="submit" class="btn btn-default">Submit</button>
                             </form>
                             <div class="modal fade" id="modal_respond" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
@@ -113,19 +113,19 @@
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                             <h4 class="modal-title" id="myModalLabel">Respond to comment</h4>
                                         </div>
-                                        <div class="modal-body">
-                                            <p><strong>{{current_comment.user_nickname}}:</strong> {{current_comment.content}}</p>
-                                            <form>
+                                        <form>
+                                            <div class="modal-body">
+                                                <p><strong>{{current_comment.user_nickname}}:</strong> {{current_comment.content}}</p>
                                                 <strong>Re:</strong>
                                                 <div class="form-group">
-                                                    <textarea class="form-control" rows="3" id="new_response" placeholder="Write your response here..."></textarea>
+                                                    <textarea maxlength="500" class="form-control" rows="3" id="new_response" placeholder="Write your response here..."></textarea>
                                                 </div>
-                                            </form>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                            <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="submit_response()">Save</button>
-                                        </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-primary" data-dismiss="modal" ng-click="submit_response()">Save</button>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
