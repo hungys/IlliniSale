@@ -67,7 +67,7 @@ def get_product(product_id):
         User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
         (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId) \
         FROM Product, User WHERE Product.ProductId = %s AND \
-        User.UserId = Product.UserId", str(product_id))
+        User.UserId = Product.UserId", (str(product_id),))
     product_data = cur.fetchone()
 
     cur.execute("SELECT Name FROM Tag WHERE ProductId = %s", str(product_id))
