@@ -155,6 +155,12 @@ myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$localSt
         $scope.get_current_user();
     });
 
+    $scope.$on('$routeChangeSuccess', function () {
+        if ($(".navbar-collapse").hasClass("in")) {
+            $('[data-toggle="collapse"]').click();
+        }
+    });
+
     $scope.get_current_user = function() {
         $http.get(AppService.GetAPIServer() + '/api/user/' + $localStorage.user_id + '/profile').success(function(response) {
             $rootScope.current_user = response
