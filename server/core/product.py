@@ -70,7 +70,7 @@ def get_product(product_id):
         User.UserId = Product.UserId", (str(product_id),))
     product_data = cur.fetchone()
 
-    cur.execute("SELECT Name FROM Tag WHERE ProductId = %s", str(product_id))
+    cur.execute("SELECT Name FROM Tag WHERE ProductId = %s", (str(product_id),))
     tags_data = cur.fetchall()
     product_tags = []
     for tag_data in tags_data:
