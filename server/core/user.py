@@ -11,7 +11,7 @@ user = Blueprint("user", __name__)
 def get_user_profile(user_id):
     cur = g.db.cursor()
     cur.execute("SELECT Nickname, FirstName, LastName, ProfilePic, Gender, unix_timestamp(CreateAt) \
-        FROM User WHERE UserId = %s", str(user_id))
+        FROM User WHERE UserId = %s", (str(user_id),))
     user_data = cur.fetchone()
 
     if user_data is None:
@@ -23,7 +23,7 @@ def get_user_profile(user_id):
         cur.execute("SELECT COUNT(*) FROM Follow WHERE FollowerUserId = %s AND FollowingUserId = %s", (str(g.user_id), str(user_id)))
         is_followed = cur.fetchone()[0]
 
-    cur.execute("SELECT COUNT(ProductId) FROM Product WHERE UserId = %s", str(user_id))
+    cur.execute("SELECT COUNT(ProductId) FROM Product WHERE UserId = %s", (str(user_id),))
     product_count = cur.fetchone()[0]
 
     cur.execute("SELECT COUNT(User.UserId) FROM User, Follow \
@@ -63,7 +63,7 @@ def get_user_follower(user_id):
             (SELECT COUNT(*) FROM Product WHERE Product.UserId = F1.FollowerUserId), \
             (SELECT COUNT(*) FROM Follow F2 WHERE F2.FollowingUserId = F1.FollowerUserId), 0 \
             FROM User, Follow F1 WHERE F1.FollowingUserId = %s AND \
-            User.UserId = F1.FollowerUserId", str(user_id))
+            User.UserId = F1.FollowerUserId", (str(user_id),))
     else:
         cur.execute("SELECT User.UserId, User.Nickname, User.FirstName, User.LastName, \
             User.ProfilePic, User.Gender, \
@@ -101,7 +101,7 @@ def get_user_following(user_id):
             (SELECT COUNT(*) FROM Product WHERE Product.UserId = F1.FollowingUserId), \
             (SELECT COUNT(*) FROM Follow F2 WHERE F2.FollowingUserId = F1.FollowingUserId), 0 \
             FROM User, Follow F1 WHERE F1.FollowerUserId = %s AND \
-            User.UserId = F1.FollowingUserId", str(user_id))
+            User.UserId = F1.FollowingUserId", (str(user_id),))
     else:
         cur.execute("SELECT User.UserId, User.Nickname, User.FirstName, User.LastName, \
             User.ProfilePic, User.Gender, \
@@ -137,7 +137,7 @@ def get_user_product(user_id):
         cur.execute("SELECT ProductId, UserId, Name, Category, Description, \
             Price, Location, IsSold, \
             (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), 0 \
-            FROM Product WHERE UserId = %s", str(user_id))
+            FROM Product WHERE UserId = %s", (str(user_id),))
     else:
         cur.execute("SELECT ProductId, UserId, Name, Category, Description, \
             Price, Location, IsSold, \
@@ -172,11 +172,11 @@ def get_user_review(user_id):
         Review.Rating, unix_timestamp(Review.CreateAt), User.Nickname, \
         User.FirstName, User.LastName, User.ProfilePic, User.Gender \
         FROM Review, User WHERE Review.ToUserId = %s AND \
-        User.UserId = Review.FromUserId", str(user_id))
+        User.UserId = Review.FromUserId", (str(user_id),))
     reviews_data = cur.fetchall()
 
     cur.execute("SELECT AVG(Rating) FROM Review WHERE \
-        Review.ToUserId = %s", str(user_id))
+        Review.ToUserId = %s", (str(user_id),))
     avg_rating = float(cur.fetchone()[0])
 
     reviews = []
@@ -284,7 +284,7 @@ def edit_user():
 
     cur = g.db.cursor()
     cur.execute("SELECT Password, Nickname, FirstName, LastName, MobilePhone, Gender, Birthday \
-        FROM User WHERE UserId = %s", str(g.user_id))
+        FROM User WHERE UserId = %s", (str(g.user_id),))
     user_data = cur.fetchone()
 
     if user_data is None:

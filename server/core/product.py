@@ -252,7 +252,7 @@ def edit_product(product_id):
 def bid_product(product_id):
     req_body = json.loads(request.data)
     cur = g.db.cursor()
-    cur.execute("SELECT ProductId FROM Product WHERE ProductId = %s", str(product_id))
+    cur.execute("SELECT ProductId FROM Product WHERE ProductId = %s", (str(product_id),))
     product_data = cur.fetchone()
 
     if product_data is None:
@@ -274,7 +274,7 @@ def bid_product(product_id):
 def post_product_comment(product_id):
     req_body = json.loads(request.data)
     cur = g.db.cursor()
-    cur.execute("SELECT ProductId FROM Product WHERE ProductId = %s", str(product_id))
+    cur.execute("SELECT ProductId FROM Product WHERE ProductId = %s", (str(product_id),))
     product_data = cur.fetchone()
 
     if product_data is None:
@@ -295,7 +295,7 @@ def post_product_comment(product_id):
 @auth.login_required
 def toggle_product_like(product_id):
     cur = g.db.cursor()
-    cur.execute("SELECT ProductId FROM Product WHERE ProductId = %s", str(product_id))
+    cur.execute("SELECT ProductId FROM Product WHERE ProductId = %s", (str(product_id),))
     product_data = cur.fetchone()
 
     if product_data is None:

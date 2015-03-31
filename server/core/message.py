@@ -8,7 +8,7 @@ message = Blueprint("message", __name__)
 @auth.login_required
 def get_conversation(user_id):
     cur = g.db.cursor()
-    cur.execute("SELECT UserId FROM User WHERE UserId = %s", str(user_id))
+    cur.execute("SELECT UserId FROM User WHERE UserId = %s", (str(user_id),))
     user_data = cur.fetchone()
 
     if user_data is None:
@@ -46,7 +46,7 @@ def get_conversation(user_id):
 def send_message(user_id):
     req_body = json.loads(request.data)
     cur = g.db.cursor()
-    cur.execute("SELECT UserId FROM User WHERE UserId = %s", str(user_id))
+    cur.execute("SELECT UserId FROM User WHERE UserId = %s", (str(user_id),))
     user_data = cur.fetchone()
 
     if user_data is None:

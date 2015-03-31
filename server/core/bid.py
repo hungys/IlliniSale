@@ -10,7 +10,7 @@ def get_my_bids():
     cur = g.db.cursor()
     cur.execute("SELECT Bid.BidId, Bid.ProductId, Bid.Price, Bid.Status, \
         unix_timestamp(Bid.CreateAt), Product.Name, Product.Price FROM Bid, Product \
-        WHERE Bid.ProductId = Product.ProductId AND Bid.UserId = %s", str(g.user_id))
+        WHERE Bid.ProductId = Product.ProductId AND Bid.UserId = %s", (str(g.user_id),))
     bids_data = cur.fetchall()
 
     my_bids = []
@@ -30,7 +30,7 @@ def get_my_bids():
     cur.execute("SELECT Bid.BidId, Bid.UserId, Bid.ProductId, Bid.Price, Bid.Status, \
         unix_timestamp(Bid.CreateAt), Product.Name, Product.Price, User.Nickname FROM Bid, Product, User \
         WHERE Bid.ProductId = Product.ProductId AND Product.UserId = %s \
-        AND User.UserId = Bid.UserId", str(g.user_id))
+        AND User.UserId = Bid.UserId", (str(g.user_id),))
     sells_data = cur.fetchall()
 
     my_sells = []
@@ -66,7 +66,7 @@ def respond_bid_request(bid_id):
     req_body = json.loads(request.data)
     cur = g.db.cursor()
     cur.execute("SELECT Bid.BidId, Bid.Status, Product.UserId FROM Bid, Product \
-        WHERE Bid.BidId = %s AND Bid.ProductId = Product.ProductId", str(bid_id))
+        WHERE Bid.BidId = %s AND Bid.ProductId = Product.ProductId", (str(bid_id),))
     bid_data = cur.fetchone()
 
     if bid_data is None:

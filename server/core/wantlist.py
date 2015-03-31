@@ -9,7 +9,7 @@ wantlist = Blueprint("wantlist", __name__)
 def get_my_wantlist():
     cur = g.db.cursor()
     cur.execute("SELECT WantlistId, Name, unix_timestamp(CreateAt) FROM Wantlist \
-        WHERE UserId = %s ORDER BY CreateAt DESC", str(g.user_id))
+        WHERE UserId = %s ORDER BY CreateAt DESC", (str(g.user_id),))
     wantlists_data = cur.fetchall()
 
     resp_body = []
@@ -45,7 +45,7 @@ def post_wantlist():
 def edit_wantlist(wantlist_id):
     req_body = json.loads(request.data)
     cur = g.db.cursor()
-    cur.execute("SELECT UserId FROM Wantlist WHERE WantlistId = %s", str(wantlist_id))
+    cur.execute("SELECT UserId FROM Wantlist WHERE WantlistId = %s", (str(wantlist_id),))
     wantlist_data = cur.fetchone()
 
     if wantlist_data is None:
@@ -65,7 +65,7 @@ def edit_wantlist(wantlist_id):
 @auth.login_required
 def delete_wantlist(wantlist_id):
     cur = g.db.cursor()
-    cur.execute("SELECT UserId FROM Wantlist WHERE WantlistId = %s", str(wantlist_id))
+    cur.execute("SELECT UserId FROM Wantlist WHERE WantlistId = %s", (str(wantlist_id),))
     wantlist_data = cur.fetchone()
 
     if wantlist_data is None:
@@ -74,7 +74,7 @@ def delete_wantlist(wantlist_id):
     if wantlist_data[0] != g.user_id:
         abort(403)
 
-    cur.execute("DELETE FROM Wantlist WHERE WantlistId = %s", str(wantlist_id))
+    cur.execute("DELETE FROM Wantlist WHERE WantlistId = %s", (str(wantlist_id),))
 
     g.db.commit()
 
