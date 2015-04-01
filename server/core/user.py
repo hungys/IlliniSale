@@ -28,12 +28,12 @@ def get_user_profile(user_id):
 
     cur.execute("SELECT COUNT(User.UserId) FROM User, Follow \
         WHERE Follow.FollowingUserId = %s AND User.UserId = Follow.FollowerUserId", 
-        str(user_id))
+        (str(user_id),))
     follower_count = cur.fetchone()[0]
 
     cur.execute("SELECT COUNT(User.UserId) FROM User, Follow \
         WHERE Follow.FollowerUserId = %s AND User.UserId = Follow.FollowingUserId", 
-        str(user_id))
+        (str(user_id),))
     following_count = cur.fetchone()[0]
 
     resp_body = {
