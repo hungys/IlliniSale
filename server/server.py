@@ -33,7 +33,7 @@ def before_request():
         token = auth_header.split(" ")[1]
         payload = jwt.decode(token, config.SERVER_SECRET, algorithms=['HS256'])
         cur = g.db.cursor()
-        cur.execute("SELECT UserId FROM User WHERE UserId = %s", str(payload["user_id"]))
+        cur.execute("SELECT UserId FROM User WHERE UserId = %s", (str(payload["user_id"]),))
         user_data = cur.fetchone()
         if user_data:
             g.user_id = payload["user_id"]
