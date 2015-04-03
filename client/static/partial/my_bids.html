@@ -7,20 +7,34 @@
 <table class="table table-hover">
     <thead>
         <tr>
+            <th>Time</th>
             <th>Product</th>
             <th>Bidder</th>
             <th>Posted Price</th>
             <th>Requested Price</th>
+            <th>Status</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
         <tr ng-repeat="bid in bids_list.sells">
+            <td>{{bid.timestamp * 1000 | date:'MM/dd/yyyy HH:mm'}}</td>
             <td><a href="#/product/{{bid.product.id}}">{{bid.product.name}}</a></td>
             <td><a href="#/user/{{bid.bidder.user_id}}">{{bid.bidder.nickname}}</a></td>
             <td>${{bid.product.price}}</td>
             <td>${{bid.price}}</td>
-            <td>{{bid.status}}</td>
+            <td>{{bid.status_display}}</td>
+            <td class="text-right">
+                <button type="button" ng-show="bid.is_new" ng-click="accept(bid)" class="btn btn-success" aria-label="Left Align">
+                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> Accept
+                </button>
+                <button type="button" ng-show="bid.is_new" ng-click="reject(bid)" class="btn btn-danger" aria-label="Left Align">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Reject
+                </button>
+                <button type="button" ng-click="contact(bid)" class="btn btn-default" aria-label="Left Align">
+                    <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Contact
+                </button>
+            </td>
         </tr>
     </tbody>
 </table>
@@ -30,18 +44,29 @@
 <table class="table table-hover">
     <thead>
         <tr>
+            <th>Time</th>
             <th>Product</th>
             <th>Posted Price</th>
             <th>Desired Price</th>
+            <th>Status</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
         <tr ng-repeat="bid in bids_list.bids">
+            <td>{{bid.timestamp * 1000 | date:'MM/dd/yyyy HH:mm'}}</td>
             <td><a href="#/product/{{bid.product.id}}">{{bid.product.name}}</a></td>
             <td>${{bid.product.price}}</td>
             <td>${{bid.price}}</td>
-            <td>{{bid.status}}</td>
+            <td>{{bid.status_display}}</td>
+            <td class="text-right">
+                <button type="button" ng-show="bid.is_accepted" ng-click="review(bid)" class="btn btn-default" aria-label="Left Align">
+                    <span class="glyphicon glyphicon-star" aria-hidden="true"></span> Review
+                </button>
+                <button type="button" ng-click="contact(bid)" class="btn btn-default" aria-label="Left Align">
+                    <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Contact
+                </button>
+            </td>
         </tr>
     </tbody>
 </table>

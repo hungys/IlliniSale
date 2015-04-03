@@ -33,6 +33,9 @@
     <!-- <li role="presentation"><a role="menuitem" tabindex="-1" href="">Delete</a></li> -->
   </ul></div></h3>
                 <p><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <a href="#/user/{{product.seller.user_id}}">{{product.seller.nickname}}</a></p>
+                <p ng-hide="product.tag_empty"><span class="glyphicon glyphicon-tags" aria-hidden="true"></span> 
+                    <span ng-repeat="tag in product.tags"><a href="">{{tag}}</a>&nbsp;&nbsp;</span>
+                </p>
                 <p><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> ${{product.price}}</p>
                 <p><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {{product.location}}</p>
                 <p>

@@ -142,6 +142,11 @@ myapp.factory('AppService', ['$rootScope', function($rootScope) {
         return Math.round(d.getTime() / 1000);
     };
 
+    service.GetDateTimeFromSecond = function(second) {
+        var d = new Date(second * 1000);
+        return d.toString();
+    };
+
     service.GetAPIServer = function() {
         return "http://127.0.0.1:5000";
     };
@@ -361,6 +366,7 @@ myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$
         $scope.product = response
         $scope.product.comment_count = $scope.product.comments.length;
         $scope.product.is_owner = $scope.product.seller.user_id == $rootScope.current_user.user_id;
+        $scope.product.tag_empty = $scope.product.tags.length == 0
 
         for (var i = 0; i < $scope.product.comments.length; i++) {
             if ($scope.product.comments[i].response != null && $scope.product.comments[i].response != "") {
@@ -380,7 +386,7 @@ myapp.controller('ProductSellController', ['$scope', '$rootScope', '$http', '$lo
                 description: $("#description").val(),
                 price: parseInt($("#price").val()),
                 location: $("#location").val(),
-                tags: []
+                tags: $("#tags").val()
             })
             .success(function(response) {
                 alertify.success("Your product has been posted.");
@@ -402,7 +408,8 @@ myapp.controller('ProductEditController', ['$scope', '$rootScope', '$http', '$lo
                 category: $scope.product.category,
                 description: $scope.product.description,
                 price: parseInt($scope.product.price),
-                location: $scope.product.location
+                location: $scope.product.location,
+                tags: $scope.product.tags_str
             })
             .success(function(response) {
                 alertify.success("Your edit has been saved.");
@@ -418,6 +425,18 @@ myapp.controller('ProductEditController', ['$scope', '$rootScope', '$http', '$lo
         $scope.product = response
         if ($scope.product.seller.user_id != $rootScope.current_user.user_id) {
             $location.path('/product/' + $scope.productId);
+        }
+
+        $scope.product.tags_str = "";
+        for (var i = 0; i < $scope.product.tags.length; i++) {
+            if ($scope.product.tags[i].indexOf(" ") > -1) {
+                $scope.product.tags_str += ("\"" + $scope.product.tags[i] + "\"");
+            } else {
+                $scope.product.tags_str += $scope.product.tags[i];
+            }
+            if (i != $scope.product.tags.length - 1) {
+                $scope.product.tags_str += " ";
+            }
         }
     });
 }]);
@@ -538,7 +557,67 @@ myapp.controller('WantlistController', ['$scope', '$rootScope', '$http', '$locat
 }]);
 
 myapp.controller('MyBidsController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
+    $scope.accept = function(bid) {
+        if (bid.is_new) {
+            $http.put(AppService.GetAPIServer() + '/api/bid/' + bid.bid_id, {
+                    "accept": 1
+                }).success(function(response) {
+                    bid.status = "accepted";
+                    bid.status_display = "Accepted";
+                    bid.is_new = false;
+                }).error(function(data, status, headers, config) {
+                    alertify.error("Fail to accept, try again later!");
+                });
+        }
+    };
+
+    $scope.reject = function(bid) {
+        if (bid.is_new) {
+            $http.put(AppService.GetAPIServer() + '/api/bid/' + bid.bid_id, {
+                    "accept": 0
+                }).success(function(response) {
+                    bid.status = "rejected";
+                    bid.status_display = "Rejected";
+                    bid.is_new = false;
+                }).error(function(data, status, headers, config) {
+                    alertify.error("Fail to reject, try again later!");
+                });
+        }
+    };
+
     $http.get(AppService.GetAPIServer() + '/api/bid').success(function(response) {
-        $scope.bids_list = response
+        $scope.bids_list = response;
+
+        for (var i = 0; i < $scope.bids_list.sells.length; i++) {
+            $scope.bids_list.sells[i].bid_time = AppService.GetDateTimeFromSecond($scope.bids_list.sells[i].timestamp);
+            $scope.bids_list.sells[i].is_new = $scope.bids_list.sells[i].status == "new";
+            switch ($scope.bids_list.sells[i].status) {
+                case "new":
+                    $scope.bids_list.sells[i].status_display = "New";
+                    break;
+                case "accepted":
+                    $scope.bids_list.sells[i].status_display = "Accepted";
+                    break;
+                case "rejected":
+                    $scope.bids_list.sells[i].status_display = "Rejected";
+                    break;
+            }
+        }
+
+        for (var i = 0; i < $scope.bids_list.bids.length; i++) {
+            $scope.bids_list.bids[i].bid_time = AppService.GetDateTimeFromSecond($scope.bids_list.bids[i].timestamp);
+            $scope.bids_list.bids[i].is_new = $scope.bids_list.bids[i].status == "new";
+            switch ($scope.bids_list.bids[i].status) {
+                case "new":
+                    $scope.bids_list.bids[i].status_display = "Pending";
+                    break;
+                case "accepted":
+                    $scope.bids_list.bids[i].status_display = "Accepted";
+                    break;
+                case "rejected":
+                    $scope.bids_list.bids[i].status_display = "Rejected";
+                    break;
+            }
+        }
     });
 }]);
