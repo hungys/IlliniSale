@@ -83,3 +83,23 @@ def respond_bid_request(bid_id):
     g.db.commit()
 
     return '', 200
+
+@bid.route('/bid/<int:bid_id>', methods=['DELETE'])
+@auth.login_required
+def delete_bid(bid_id):
+    cur = g.db.cursor()
+    cur.execute("SELECT Bid.BidId, Bid.UserId FROM Bid \
+        WHERE Bid.BidId = %s AND Bid.Status = 'new'", (str(bid_id),))
+    bid_data = cur.fetchone()
+
+    if bid_data is None:
+        abort(404)
+
+    if bid_data[1] != g.user_id:
+        abort(403)
+
+    cur.execute("DELETE FROM Bid WHERE BidId = %s", (str(bid_id),))
+
+    g.db.commit()
+
+    return '', 200

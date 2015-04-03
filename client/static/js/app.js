@@ -585,6 +585,18 @@ myapp.controller('MyBidsController', ['$scope', '$http', '$location', '$route', 
         }
     };
 
+    $scope.delete = function(bid) {
+        if (bid.is_new) {
+            $http.delete(AppService.GetAPIServer() + '/api/bid/' + bid.bid_id)
+                .success(function(response) {
+                    var index = $scope.bids_list.bids.indexOf(bid);
+                    $scope.bids_list.bids.splice(index, 1); 
+                }).error(function(data, status, headers, config) {
+                    alertify.error("Fail to delete, try again later!");
+                });
+        }
+    };
+
     $http.get(AppService.GetAPIServer() + '/api/bid').success(function(response) {
         $scope.bids_list = response;
 
@@ -607,6 +619,7 @@ myapp.controller('MyBidsController', ['$scope', '$http', '$location', '$route', 
         for (var i = 0; i < $scope.bids_list.bids.length; i++) {
             $scope.bids_list.bids[i].bid_time = AppService.GetDateTimeFromSecond($scope.bids_list.bids[i].timestamp);
             $scope.bids_list.bids[i].is_new = $scope.bids_list.bids[i].status == "new";
+            $scope.bids_list.bids[i].is_accepted = $scope.bids_list.bids[i].status == "accepted";
             switch ($scope.bids_list.bids[i].status) {
                 case "new":
                     $scope.bids_list.bids[i].status_display = "Pending";

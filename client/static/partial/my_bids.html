@@ -60,6 +60,9 @@
             <td>${{bid.price}}</td>
             <td>{{bid.status_display}}</td>
             <td class="text-right">
+                <button type="button" ng-show="bid.is_new" ng-click="delete(bid)" class="btn btn-danger" aria-label="Left Align">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Delete
+                </button>
                 <button type="button" ng-show="bid.is_accepted" ng-click="review(bid)" class="btn btn-default" aria-label="Left Align">
                     <span class="glyphicon glyphicon-star" aria-hidden="true"></span> Review
                 </button>
