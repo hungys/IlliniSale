@@ -1,6 +1,6 @@
 'use strict';
 
-var myapp = angular.module('myApp', ['ngStorage', 'ngRoute'])
+var myapp = angular.module('myApp', ['ngStorage', 'ngRoute', 'angularFileUpload'])
     .config(['$httpProvider', function($httpProvider) {
         $httpProvider.interceptors.push(['$localStorage', function($localStorage) {
             return {
@@ -152,6 +152,51 @@ myapp.factory('AppService', ['$rootScope', function($rootScope) {
     };
 
     return service;
+}]);
+
+myapp.directive('ngThumb', ['$window', function($window) {
+    var helper = {
+        support: !!($window.FileReader && $window.CanvasRenderingContext2D),
+        isFile: function(item) {
+            return angular.isObject(item) && item instanceof $window.File;
+        },
+        isImage: function(file) {
+            var type =  '|' + file.type.slice(file.type.lastIndexOf('/') + 1) + '|';
+            return '|jpg|png|jpeg|bmp|gif|'.indexOf(type) !== -1;
+        }
+    };
+
+    return {
+        restrict: 'A',
+        template: '<canvas/>',
+        link: function(scope, element, attributes) {
+            if (!helper.support) return;
+
+            var params = scope.$eval(attributes.ngThumb);
+
+            if (!helper.isFile(params.file)) return;
+            if (!helper.isImage(params.file)) return;
+
+            var canvas = element.find('canvas');
+            var reader = new FileReader();
+
+            reader.onload = onLoadFile;
+            reader.readAsDataURL(params.file);
+
+            function onLoadFile(event) {
+                var img = new Image();
+                img.onload = onLoadImage;
+                img.src = event.target.result;
+            }
+
+            function onLoadImage() {
+                var width = params.width || this.width / this.height * params.height;
+                var height = params.height || this.height / this.width * params.width;
+                canvas.attr({ width: width, height: height });
+                canvas[0].getContext('2d').drawImage(this, 0, 0, width, height);
+            }
+        }
+    };
 }]);
 
 myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$localStorage', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $localStorage, $location, $route, AuthService, AppService) {
@@ -378,7 +423,7 @@ myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$
     });
 }]);
 
-myapp.controller('ProductSellController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $location, $route, AuthService, AppService) {
+myapp.controller('ProductSellController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', 'FileUploader', function($scope, $rootScope, $http, $location, $route, AuthService, AppService, FileUploader) {
     $scope.submit = function() {
         $http.post(AppService.GetAPIServer() + '/api/product' , {
                 name: $("#name").val(),
@@ -389,11 +434,40 @@ myapp.controller('ProductSellController', ['$scope', '$rootScope', '$http', '$lo
                 tags: $("#tags").val()
             })
             .success(function(response) {
-                alertify.success("Your product has been posted.");
-                $location.path('/product/' + response.product_id);
+                if ($scope.uploader.queue.length == 0) {
+                    alertify.success("Your product has been posted.");
+                    $location.path('/product/' + response.product_id);
+                } else {
+                    $scope.redirect_id = response.product_id;
+                    $scope.uploader.uploadAll();
+                }
             }).error(function(data, status, headers, config) {
                 alertify.error("Fail to submit, try again later!");
             });
+    };
+
+    var uploader = $scope.uploader = new FileUploader({
+        url: AppService.GetAPIServer() + '/api/product/upload'
+    });
+
+    uploader.filters.push({
+        name: 'imageFilter',
+        fn: function(item /*{File|FileLikeObject}*/, options) {
+            var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
+            return '|jpg|png|jpeg|bmp|gif|'.indexOf(type) !== -1;
+        }
+    });
+
+    uploader.onBeforeUploadItem = function(item) {
+        var formData = [{
+            product_id: $scope.redirect_id,
+        }];
+        Array.prototype.push.apply(item.formData, formData);
+    };
+
+    uploader.onCompleteAll = function() {
+        alertify.success("Your product has been posted.");
+        $location.path('/product/' + $scope.redirect_id);
     };
 
     $scope.category_list = $rootScope.category_list;

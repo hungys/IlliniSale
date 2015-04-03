@@ -1,6 +1,9 @@
 from flask import Blueprint, g, make_response, abort, request
+from werkzeug import secure_filename
 from core.permission import auth
 import json
+import os
+import uuid
 
 product = Blueprint("product", __name__)
 
@@ -316,6 +319,24 @@ def toggle_product_like(product_id):
     resp = make_response(json.dumps(resp_body), 200)
     resp.headers["Content-Type"] = "application/json"
     return resp
+
+@product.route('/product/upload', methods=['POST'])
+def upload_product_photo():
+    product_id = request.form['product_id']
+    photo_file = request.files['file']
+    filename = str(uuid.uuid1()) + "." + get_file_extension(photo_file.filename)
+    if photo_file:
+        photo_file.save(os.path.join("uploads/product", filename))
+    
+    cur = g.db.cursor()
+    cur.execute("INSERT INTO Photo(ProductId, FileName) VALUES(%s, %s)", (str(product_id), filename))
+    g.db.commit()
+
+    return '', 200
+
+def get_file_extension(filename):
+    token = filename.split(".")
+    return token[-1] if len(token) > 1 else None
 
 def parse_tags(tags):
     start_idx = 0
