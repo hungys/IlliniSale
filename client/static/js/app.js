@@ -618,7 +618,7 @@ myapp.controller('MyBidsController', ['$scope', '$rootScope', '$http', '$locatio
                 }).success(function(response) {
                     $scope.current_conversation.messages.push({
                         "content": $("#new_message").val(),
-                        "timestamp": AppService.GetCurrentTime,
+                        "timestamp": AppService.GetCurrentTime(),
                         "speaker": $rootScope.current_user.user_id,
                         "from_me": true
                     });
@@ -626,6 +626,33 @@ myapp.controller('MyBidsController', ['$scope', '$rootScope', '$http', '$locatio
                 }).error(function(data, status, headers, config) {
                     alertify.error("Fail to send, try again later!");
                 });
+    };
+
+    $scope.review = function(bid) {
+        $scope.current_review = {
+            "bid_id": bid.bid_id,
+            "user_id": bid.product.seller_user_id,
+            "nickname": bid.product.seller_nickname
+        };
+    };
+
+    $scope.submit_review = function() {
+        $http.post(AppService.GetAPIServer() + '/api/user/' + $scope.current_review.user_id + '/review', {
+                "bid_id": $scope.current_review.bid_id,
+                "rating": 5,
+                "content": $("#new_review").val()
+            }).success(function(response) {
+                for (var i = 0; i < $scope.bids_list.bids.length; i++) {
+                    if ($scope.bids_list.bids[i].bid_id == $scope.current_review.bid_id) {
+                        $scope.bids_list.bids[i].is_reviewed = 1;
+                    }
+                }
+                $("#new_review").val("");
+                $("#modal_review").modal('hide');
+                alertify.success("Your review has been posted.")
+            }).error(function(data, status, headers, config) {
+                alertify.error("Fail to submit, try again later!");
+            });
     };
 
     $http.get(AppService.GetAPIServer() + '/api/bid').success(function(response) {

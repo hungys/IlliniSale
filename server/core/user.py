@@ -337,8 +337,8 @@ def review_user(user_id):
 
     req_body = json.loads(request.data)
     cur = g.db.cursor()
-    cur.execute("INSERT INTO Review(FromUserId, ToUserId, Body, Rating) \
-        VALUES(%s, %s, %s, %s)", (str(g.user_id), str(user_id), 
+    cur.execute("INSERT INTO Review(BidId, FromUserId, ToUserId, Body, Rating) \
+        VALUES(%s, %s, %s, %s, %s)", (str(req_body["bid_id"]), str(g.user_id), str(user_id), 
         req_body["content"], str(req_body["rating"])))
 
     g.db.commit()

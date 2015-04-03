@@ -84,6 +84,7 @@ CREATE TABLE `Review`
     `ReviewId` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `FromUserId` INT NOT NULL,
     `ToUserId` INT NOT NULL,
+    `BidId` INT NOT NULL,
     `Body` NVARCHAR(500),
     `Rating` INT,
     `CreateAt` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
