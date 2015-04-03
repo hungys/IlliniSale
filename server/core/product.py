@@ -70,12 +70,6 @@ def get_product(product_id):
         User.UserId = Product.UserId", (str(product_id),))
     product_data = cur.fetchone()
 
-    cur.execute("SELECT Name FROM Tag WHERE ProductId = %s", (str(product_id),))
-    tags_data = cur.fetchall()
-    product_tags = []
-    for tag_data in tags_data:
-        product_tags.append(tag_data[0])
-
     cur.execute("SELECT Comment.CommentId, Comment.UserId, Comment.Body, Comment.Response, \
         unix_timestamp(Comment.CreateAt), unix_timestamp(Comment.UpdateAt), \
         User.Nickname, User.ProfilePic FROM Comment, User WHERE \
@@ -127,7 +121,7 @@ def get_product(product_id):
         "location": product_data[5],
         "photos": product_photos,
         "comments": product_comments,
-        "tags": product_tags,
+        "tags": get_tags_of_product(product_id),
         "is_sold": product_data[6],
         "post_time": product_data[7],
         "likes": product_data[13],
@@ -205,8 +199,7 @@ def post_product():
 
     product_id = cur.lastrowid
 
-    for tag in req_body["tags"]:
-        cur.execute("INSERT INTO Tag(ProductId, Name) VALUES(%s, %s)", (str(product_id), tag))
+    update_tags_of_product(product_id, req_body["tags"])
 
     g.db.commit()
 
@@ -232,11 +225,14 @@ def edit_product(product_id):
     if product_data is None:
         abort(404)
 
-    name = req_body["name"] if "name" in req_body else user_data[0]
-    category = req_body["category"] if "category" in req_body else user_data[1]
-    description = req_body["description"] if "description" in req_body else user_data[2]
-    price = req_body["price"] if "price" in req_body else user_data[3]
-    location = req_body["location"] if "location" in req_body else user_data[4]
+    name = req_body["name"] if "name" in req_body else product_data[0]
+    category = req_body["category"] if "category" in req_body else product_data[1]
+    description = req_body["description"] if "description" in req_body else product_data[2]
+    price = req_body["price"] if "price" in req_body else product_data[3]
+    location = req_body["location"] if "location" in req_body else product_data[4]
+
+    if "tags" in req_body:
+        update_tags_of_product(product_id, req_body["tags"])
 
     cur.execute("UPDATE Product SET Name = %s, Category = %s, Description = %s, \
         Price = %s, Location = %s \
@@ -320,3 +316,59 @@ def toggle_product_like(product_id):
     resp = make_response(json.dumps(resp_body), 200)
     resp.headers["Content-Type"] = "application/json"
     return resp
+
+def parse_tags(tags):
+    start_idx = 0
+    in_quote = False
+    result = []
+
+    tags = tags.strip()
+    i = 0
+
+    while i < len(tags):
+        if tags[i] == "\"" and not in_quote:
+            in_quote = True
+            start_idx = i + 1
+        elif tags[i] == "\"" and in_quote:
+            result.append(tags[start_idx:i].strip())
+            in_quote = False
+            start_idx = i + 2
+            i = i + 1
+        elif tags[i] == " " and not in_quote:
+            if tags[start_idx:i].strip() != "":
+                result.append(tags[start_idx:i].strip())
+                start_idx = i + 1
+        elif i == len(tags) - 1:
+            result.append(tags[start_idx:i+1].strip())
+
+        i = i + 1
+
+    return result
+
+def get_tags_of_product(product_id):
+    cur = g.db.cursor()
+    cur.execute("SELECT Name FROM Tag WHERE ProductId = %s", (str(product_id),))
+    tags_data = cur.fetchall()
+
+    tags = []
+    for tag in tags_data:
+        tags.append(tag[0])
+
+    return tags
+
+def update_tags_of_product(product_id, tags_str):
+    original_tag_set = set(get_tags_of_product(product_id))
+    updated_tag_set = set(parse_tags(tags_str))
+
+    to_be_inserted = updated_tag_set.difference(original_tag_set)
+    to_be_deleted = original_tag_set.difference(updated_tag_set)
+
+    cur = g.db.cursor()
+
+    for tag in to_be_inserted:
+        cur.execute("INSERT INTO Tag(ProductId, Name) VALUES(%s, %s)", (str(product_id), tag))
+
+    for tag in to_be_deleted:
+        cur.execute("DELETE FROM Tag WHERE ProductId = %s AND Name = %s", (str(product_id), tag))
+
+    g.db.commit()
