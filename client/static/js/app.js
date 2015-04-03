@@ -556,7 +556,7 @@ myapp.controller('WantlistController', ['$scope', '$rootScope', '$http', '$locat
     });
 }]);
 
-myapp.controller('MyBidsController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
+myapp.controller('MyBidsController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $location, $route, AuthService, AppService) {
     $scope.accept = function(bid) {
         if (bid.is_new) {
             $http.put(AppService.GetAPIServer() + '/api/bid/' + bid.bid_id, {
@@ -595,6 +595,37 @@ myapp.controller('MyBidsController', ['$scope', '$http', '$location', '$route', 
                     alertify.error("Fail to delete, try again later!");
                 });
         }
+    };
+
+    $scope.contact = function(bid, user_id, nickname) {
+        $scope.current_conversation = {
+            "user_id": user_id,
+            "nickname": nickname
+        };
+
+        $http.get(AppService.GetAPIServer() + '/api/message/' + user_id)
+            .success(function(response) {
+                $scope.current_conversation.messages = response
+                for (var i = 0; i < $scope.current_conversation.messages.length; i++) {
+                    $scope.current_conversation.messages[i].from_me = $scope.current_conversation.messages[i].speaker == $rootScope.current_user.user_id;
+                }
+            });
+    };
+
+    $scope.send_message = function() {
+        $http.post(AppService.GetAPIServer() + '/api/message/' + $scope.current_conversation.user_id, {
+                    "content": $("#new_message").val()
+                }).success(function(response) {
+                    $scope.current_conversation.messages.push({
+                        "content": $("#new_message").val(),
+                        "timestamp": AppService.GetCurrentTime,
+                        "speaker": $rootScope.current_user.user_id,
+                        "from_me": true
+                    });
+                    $("#new_message").val("");
+                }).error(function(data, status, headers, config) {
+                    alertify.error("Fail to send, try again later!");
+                });
     };
 
     $http.get(AppService.GetAPIServer() + '/api/bid').success(function(response) {

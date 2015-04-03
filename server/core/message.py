@@ -26,7 +26,7 @@ def get_conversation(user_id):
 
     cur.execute("SELECT SpeakerUserId, Body, unix_timestamp(CreateAt) \
         FROM Message WHERE SmallerUserId = %s AND \
-        GreaterUserId = %s ORDER BY CreateAt DESC", (str(smaller_userid), str(greater_userid)))
+        GreaterUserId = %s ORDER BY CreateAt ASC", (str(smaller_userid), str(greater_userid)))
     messages_data = cur.fetchall()
 
     resp_body = []

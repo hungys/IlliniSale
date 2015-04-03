@@ -1,10 +1,6 @@
 Message API
 ===========
 
-# Get all conversations
-
-Developing...
-
 # Get all messages with a user
 
 Endpoint: `GET /api/message/<user_id>`

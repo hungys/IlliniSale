@@ -9,8 +9,9 @@ bid = Blueprint("bid", __name__)
 def get_my_bids():
     cur = g.db.cursor()
     cur.execute("SELECT Bid.BidId, Bid.ProductId, Bid.Price, Bid.Status, \
-        unix_timestamp(Bid.CreateAt), Product.Name, Product.Price FROM Bid, Product \
-        WHERE Bid.ProductId = Product.ProductId AND Bid.UserId = %s", (str(g.user_id),))
+        unix_timestamp(Bid.CreateAt), Product.Name, Product.Price, Product.UserId, \
+        User.Nickname FROM Bid, Product, User WHERE Bid.ProductId = Product.ProductId \
+        AND Bid.UserId = %s AND User.UserId = Bid.UserId", (str(g.user_id),))
     bids_data = cur.fetchall()
 
     my_bids = []
@@ -23,7 +24,9 @@ def get_my_bids():
             "product": {
                 "id": bid_data[1],
                 "name": bid_data[5],
-                "price": bid_data[6]
+                "price": bid_data[6],
+                "seller_user_id": bid_data[7],
+                "seller_nickname": bid_data[8]
             }
         })
 
