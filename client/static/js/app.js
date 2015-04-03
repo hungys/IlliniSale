@@ -639,7 +639,7 @@ myapp.controller('MyBidsController', ['$scope', '$rootScope', '$http', '$locatio
     $scope.submit_review = function() {
         $http.post(AppService.GetAPIServer() + '/api/user/' + $scope.current_review.user_id + '/review', {
                 "bid_id": $scope.current_review.bid_id,
-                "rating": 5,
+                "rating": $("#new_rating").val(),
                 "content": $("#new_review").val()
             }).success(function(response) {
                 for (var i = 0; i < $scope.bids_list.bids.length; i++) {
