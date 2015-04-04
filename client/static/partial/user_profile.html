@@ -48,7 +48,7 @@
                             <a href="#/user/{{review.reviewer.user_id}}"><img src="/uploads/user/{{review.reviewer.profile_pic}}" class="img-circle" style="width: 50px; height: 50px"><a/>
                         </div>
                         <div class="col-md-10">
-                            <p>{{review.content}}</p>
+                            <p><span ng-class="{'glyphicon glyphicon-thumbs-down': review.rating == -1, 'glyphicon glyphicon-thumbs-right': review.rating == 0, 'glyphicon glyphicon-thumbs-up': review.rating == 1}" aria-hidden="true"></span> {{review.content}}</p>
                             <small>─ {{review.reviewer.nickname}}</small>
                         </div>
                     </div>
