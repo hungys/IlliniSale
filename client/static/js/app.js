@@ -473,7 +473,7 @@ myapp.controller('ProductSellController', ['$scope', '$rootScope', '$http', '$lo
     $scope.category_list = $rootScope.category_list;
 }]);
 
-myapp.controller('ProductEditController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $location, $route, AuthService, AppService) {
+myapp.controller('ProductEditController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', 'FileUploader', function($scope, $rootScope, $http, $location, $route, AuthService, AppService, FileUploader) {
     $scope.productId = $route.current.params.product_id;
 
     $scope.save = function() {
@@ -486,11 +486,49 @@ myapp.controller('ProductEditController', ['$scope', '$rootScope', '$http', '$lo
                 tags: $scope.product.tags_str
             })
             .success(function(response) {
-                alertify.success("Your edit has been saved.");
-                $location.path('/product/' + $scope.productId);
+                if ($scope.uploader.queue.length == 0) {
+                    alertify.success("Your edit has been saved.");
+                    $location.path('/product/' + $scope.productId);
+                } else {
+                    $scope.uploader.uploadAll();
+                }
             }).error(function(data, status, headers, config) {
                 alertify.error("Fail to save, try again later!");
             });
+    };
+
+    $scope.delete_photo = function(photo) {
+        $http.delete(AppService.GetAPIServer() + '/api/product/upload/' + photo.photo_id)
+            .success(function(response) {
+                var index = $scope.product.photos.indexOf(photo);
+                $scope.product.photos.splice(index, 1);
+            }).error(function(data, status, headers, config) {
+                alertify.error("Fail to delete, try again later!");
+            });
+    };
+
+    var uploader = $scope.uploader = new FileUploader({
+        url: AppService.GetAPIServer() + '/api/product/upload'
+    });
+
+    uploader.filters.push({
+        name: 'imageFilter',
+        fn: function(item /*{File|FileLikeObject}*/, options) {
+            var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
+            return '|jpg|png|jpeg|bmp|gif|'.indexOf(type) !== -1;
+        }
+    });
+
+    uploader.onBeforeUploadItem = function(item) {
+        var formData = [{
+            product_id: $scope.productId,
+        }];
+        Array.prototype.push.apply(item.formData, formData);
+    };
+
+    uploader.onCompleteAll = function() {
+        alertify.success("Your edit has been saved.");
+        $location.path('/product/' + $scope.productId);
     };
 
     $scope.category_list = $rootScope.category_list;

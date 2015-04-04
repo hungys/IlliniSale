@@ -19,7 +19,8 @@ def get_products(category):
         cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
             Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
             User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
-            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), 0 \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), 0 , \
+            (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
             FROM Product, User WHERE Product.Category = %s AND \
             User.UserId = Product.UserId ORDER BY Product.Ranking,Product.CreateAt DESC \
             LIMIT %s,%s", (category, offset, rows_per_page))
@@ -28,7 +29,8 @@ def get_products(category):
             Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
             User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
             (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), \
-            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s) \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s), \
+            (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
             FROM Product, User WHERE Product.Category = %s AND \
             User.UserId = Product.UserId ORDER BY Product.Ranking,Product.CreateAt DESC \
             LIMIT %s,%s", (str(g.user_id), category, offset, rows_per_page))
@@ -51,7 +53,7 @@ def get_products(category):
             "description": product_data[4],
             "price": product_data[5],
             "location": product_data[6],
-            "photo": "",
+            "photo": product_data[15],
             "is_sold": product_data[7],
             "likes": product_data[13],
             "is_liked": product_data[14]
@@ -92,11 +94,14 @@ def get_product(product_id):
             "user_profile_pic": comment_data[7]
         })
 
-    cur.execute("SELECT FileName FROM Photo WHERE ProductId = %s", (str(product_id),))
+    cur.execute("SELECT PhotoId, FileName FROM Photo WHERE ProductId = %s", (str(product_id),))
     photos_data = cur.fetchall()
     product_photos = []
     for photo_data in photos_data:
-        product_photos.append(photo_data[0])
+        product_photos.append({
+            "photo_id": photo_data[0],
+            "filename": photo_data[1]    
+        })
 
     if g.user_id is None:
         is_liked = 0
@@ -330,6 +335,30 @@ def upload_product_photo():
     
     cur = g.db.cursor()
     cur.execute("INSERT INTO Photo(ProductId, FileName) VALUES(%s, %s)", (str(product_id), filename))
+    g.db.commit()
+
+    return '', 200
+
+@product.route('/product/upload/<int:photo_id>', methods=['DELETE'])
+@auth.login_required
+def delete_product_photo(photo_id):
+    cur = g.db.cursor()
+    cur.execute("SELECT Product.UserId, Photo.FileName FROM Product, Photo \
+        WHERE Product.ProductId = Photo.ProductId AND Photo.PhotoId = %s", (str(photo_id),))
+    product_data = cur.fetchone()
+
+    if product_data is None:
+        abort(404)
+
+    if product_data[0] != g.user_id:
+        abort(403)
+
+    try:
+        os.remove(os.path.join("uploads/product", product_data[1]))
+    except:
+        pass
+        
+    cur.execute("DELETE FROM Photo WHERE PhotoId = %s", (str(photo_id),))
     g.db.commit()
 
     return '', 200
