@@ -4,6 +4,7 @@ from md5 import md5
 import json
 import jwt
 import config
+import os
 
 user = Blueprint("user", __name__)
 
@@ -180,7 +181,7 @@ def get_user_review(user_id):
     cur.execute("SELECT COUNT(Rating) FROM Review WHERE \
         Review.ToUserId = %s AND Rating = -1", (str(user_id),))
     negative_count = cur.fetchone()[0]
-    percentage = int(round(100 - (float(negative_count) / float(len(reviews_data)) * 100.0 if len(reviews_data) > 0 else 0)))
+    percentage = int(round(100 - (float(negative_count) / float(len(reviews_data)) * 100.0 if len(reviews_data) > 0 else 100.0)))
 
     reviews = []
     for review_data in reviews_data:
@@ -231,6 +232,31 @@ def toggle_user_follow(user_id):
     g.db.commit()
 
     resp_body = {"followed": not is_followed}
+
+    resp = make_response(json.dumps(resp_body), 200)
+    resp.headers["Content-Type"] = "application/json"
+    return resp
+
+@user.route('/user', methods=['GET'])
+def get_user_settings():
+    cur = g.db.cursor()
+    cur.execute("SELECT Email, Nickname, FirstName, LastName, MobilePhone, Gender, Birthday, ProfilePic \
+        FROM User WHERE UserId = %s", (str(g.user_id),))
+    user_data = cur.fetchone()
+
+    if user_data is None:
+        abort(404)
+
+    resp_body = {
+        "email": user_data[0],
+        "nickname": user_data[1],
+        "first_name": user_data[2],
+        "last_name": user_data[3],
+        "mobile_phone": user_data[4],
+        "gender": user_data[5],
+        "birthday": str(user_data[6]),
+        "profile_pic": user_data[7]
+    }
 
     resp = make_response(json.dumps(resp_body), 200)
     resp.headers["Content-Type"] = "application/json"
@@ -293,7 +319,7 @@ def edit_user():
     if user_data is None:
         abort(404)
 
-    password_hashed = md5(req_body["password"]).hexdigest() if "password" in req_body else user_data[0]
+    password_hashed = md5(req_body["password"]).hexdigest() if "password" in req_body and req_body["password"] != "" else user_data[0]
     nickname = req_body["nickname"] if "nickname" in req_body else user_data[1]
     first_name = req_body["first_name"] if "first_name" in req_body else user_data[2]
     last_name = req_body["last_name"] if "last_name" in req_body else user_data[3]
@@ -306,6 +332,20 @@ def edit_user():
         WHERE UserId = %s", (password_hashed, nickname, first_name, 
         last_name, mobile_phone, gender, birthday, str(g.user_id)))
 
+    g.db.commit()
+
+    return '', 200
+
+@user.route('/user/upload', methods=['POST'])
+def upload_profile_picture():
+    user_id = request.form['user_id']
+    photo_file = request.files['file']
+    filename = "user_" + str(user_id) + "." + get_file_extension(photo_file.filename)
+    if photo_file:
+        photo_file.save(os.path.join("uploads/user", filename))
+    
+    cur = g.db.cursor()
+    cur.execute("UPDATE User SET ProfilePic = %s WHERE UserId = %s", (filename, str(user_id)))
     g.db.commit()
 
     return '', 200
@@ -347,3 +387,7 @@ def review_user(user_id):
     g.db.commit()
 
     return '', 200
+
+def get_file_extension(filename):
+    token = filename.split(".")
+    return token[-1] if len(token) > 1 else None

@@ -23,12 +23,12 @@
             <div class="panel-body">
                 <div class="row">
                     <div class="col-md-4">
-                        <img src="http://placehold.it/100x100" class="img-circle">
+                        <img src="/uploads/user/{{user.profile_pic}}" class="img-circle" style="width: 100px; height: 100px">
                     </div>
                     <div class="col-md-8">
                         <h4>{{user.first_name}} {{user.last_name}}</h4>
                         <p>@{{user.nickname}}</p>
-                        <p>{{reviews_list.percentage}}% Positive</p>
+                        <p>{{reviews_list.percentage}}% Positive ({{reviews_list.reviews.length}})</p>
                     </div>
                 </div>
                 <div class="row">
@@ -45,8 +45,7 @@
                 <div ng-repeat="review in reviews_list.reviews">
                     <div class="row">
                         <div class="col-md-2">
-                            <img src="http://placehold.it/50/55C1E7/fff&text=U" class="img-circle"/>
-                            <!-- <small>{{review.reviewer.nickname}}</small> -->
+                            <a href="#/user/{{review.reviewer.user_id}}"><img src="/uploads/user/{{review.reviewer.profile_pic}}" class="img-circle" style="width: 50px; height: 50px"><a/>
                         </div>
                         <div class="col-md-10">
                             <p>{{review.content}}</p>
@@ -90,7 +89,7 @@
                     <br/>
                     <div class="col-md-4" ng-repeat="follower in followers_list">
                         <div class="thumbnail">
-                            <a href="#/user/{{follower.user_id}}"><img src="http://placehold.it/120x120" class="img-circle"><a/>
+                            <a href="#/user/{{follower.user_id}}"><img src="/uploads/user/{{follower.profile_pic}}" class="img-circle center-block" style="width: 120px; height: 120px"><a/>
                                 <div class="caption text-center">
                                     <strong><a href="#/user/{{follower.user_id}}">{{follower.nickname}}</a></strong>
                                     <p>{{follower.product_count}} products · {{follower.follower_count}} followers</p>
@@ -103,7 +102,7 @@
                     <br/>
                     <div class="col-md-4" ng-repeat="following in followings_list">
                         <div class="thumbnail">
-                            <a href="#/user/{{following.user_id}}"><img src="http://placehold.it/120x120" class="img-circle"><a/>
+                            <a href="#/user/{{following.user_id}}"><img src="/uploads/user/{{following.profile_pic}}" class="img-circle center-block" style="width: 120px; height: 120px"><a/>
                                 <div class="caption text-center">
                                     <strong><a href="#/user/{{following.user_id}}">{{following.nickname}}</a></strong>
                                     <p>{{following.product_count}} products · {{following.follower_count}} followers</p>

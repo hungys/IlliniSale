@@ -1,45 +1,43 @@
 <div class="page-header">
-  <h2>Register</h2>
+  <h2>Settings</h2>
 </div>
 
 <div class="row">
     <div class="col-md-4 col-md-offset-4">
-        <div ng-hide="email_valid" class="alert alert-danger" role="alert">Oops! The email has been used.</div>
         <form ng-submit="submit()">
-            <div ng-class="{true:'form-group', false:'form-group has-error'}[email_valid]">
+            <div class="form-group">
+                <img src="/uploads/user/{{user.profile_pic}}" class="img-circle center-block" style="height: 250px; width: 250px;">
+            </div>
+            <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" maxlength="100" class="form-control" id="email" required>
+                <input type="email" maxlength="100" class="form-control" ng-model="user.email" id="email" readonly>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" class="form-control" id="password" required>
+                <input type="password" class="form-control" ng-model="user.password" id="password" placeholder="Leave blank if no change">
             </div>
             <div class="form-group">
                 <label for="first_name">First Name</label>
-                <input maxlength="30" class="form-control" id="first_name" required>
+                <input maxlength="30" class="form-control" ng-model="user.first_name" id="first_name" required>
             </div>
             <div class="form-group">
                 <label for="last_name">Last Name</label>
-                <input maxlength="30" class="form-control" id="last_name" required>
+                <input maxlength="30" class="form-control" ng-model="user.last_name" id="last_name" required>
             </div>
             <div class="form-group">
                 <label for="nickname">Nickname</label>
-                <input maxlength="30" class="form-control" id="nickname" required>
+                <input maxlength="30" class="form-control" ng-model="user.nickname" id="nickname" required>
             </div>
             <div class="form-group">
                 <label for="gender">Gender</label>
-                <select class="form-control" id="gender">
+                <select class="form-control" ng-model="user.gender" id="gender">
                     <option value="0">Male</option>
                     <option value="1">Female</option>
                 </select>
             </div>
             <div class="form-group">
                 <label for="mobile_phone">Mobile Phone</label>
-                <input type="tel" maxlength="15" class="form-control" id="mobile_phone" required>
-            </div>
-            <div class="form-group">
-                <label for="birthday">Birthday</label>
-                <input type="date" class="form-control" id="birthday" placeholder="mm/dd/yyyy" required>
+                <input type="tel" maxlength="15" class="form-control" ng-model="user.mobile_phone" id="mobile_phone" required>
             </div>
             <div class="form-group">
                 <label for="description">Profile Picture</label>
@@ -51,7 +49,7 @@
                 </div>
             </div>
             <br/>
-            <button type="submit" class="btn btn-default" ng-disabled="!email_valid">Register</button>
+            <button type="submit" class="btn btn-default">Save</button>
         </form>
     </div>
 </div>

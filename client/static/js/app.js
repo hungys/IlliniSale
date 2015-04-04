@@ -51,6 +51,10 @@ var myapp = angular.module('myApp', ['ngStorage', 'ngRoute', 'angularFileUpload'
                 templateUrl: 'static/partial/user_profile.html',
                 controller: 'UserProfileController'
             })
+            .when('/settings', {
+                templateUrl: 'static/partial/user_settings.html',
+                controller: 'UserSettingsController'
+            })
             .when('/wantlist', {
                 templateUrl: 'static/partial/wantlist.html',
                 controller: 'WantlistController'
@@ -266,7 +270,7 @@ myapp.controller('UserLoginController', ['$scope', '$http', '$location', '$route
     };
 }]);
 
-myapp.controller('UserRegisterController', ['$scope', '$rootScope', '$http', '$localStorage', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $localStorage, $location, $route, AuthService, AppService) {
+myapp.controller('UserRegisterController', ['$scope', '$rootScope', '$http', '$localStorage', '$location', '$route', 'AuthService', 'AppService', 'FileUploader', function($scope, $rootScope, $http, $localStorage, $location, $route, AuthService, AppService, FileUploader) {
     if (AuthService.IsLoggedIn()) {
         $location.path('/');
     }
@@ -285,10 +289,14 @@ myapp.controller('UserRegisterController', ['$scope', '$rootScope', '$http', '$l
             .success(function(response) {
                 $localStorage.user_id = response.user_id
                 $localStorage.token = response.token
-                $rootScope.$broadcast("auth_changed");
-                alertify.success("Your are now logged in.");
-                $route.reload()
-                $location.path('/');
+                if ($scope.uploader.queue.length == 0) {
+                    $rootScope.$broadcast("auth_changed");
+                    alertify.success("Your are now logged in.");
+                    $route.reload()
+                    $location.path('/');
+                } else {
+                    $scope.uploader.uploadAll();
+                }
             }).error(function(data, status, headers, config) {
                 alertify.error("Fail to register, try again later!");
             });
@@ -305,10 +313,102 @@ myapp.controller('UserRegisterController', ['$scope', '$rootScope', '$http', '$l
             });
     };
 
+    var uploader = $scope.uploader = new FileUploader({
+        url: AppService.GetAPIServer() + '/api/user/upload',
+        queueLimit: 1
+    });
+
+    uploader.filters.push({
+        name: 'imageFilter',
+        fn: function(item /*{File|FileLikeObject}*/, options) {
+            var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
+            return '|jpg|png|jpeg|bmp|gif|'.indexOf(type) !== -1;
+        }
+    });
+
+    uploader.onBeforeUploadItem = function(item) {
+        var formData = [{
+            user_id: $localStorage.user_id,
+        }];
+        Array.prototype.push.apply(item.formData, formData);
+    };
+
+    uploader.onCompleteAll = function() {
+        $rootScope.$broadcast("auth_changed");
+        alertify.success("Your are now logged in.");
+        $route.reload()
+        $location.path('/');
+    };
+
     $scope.email_valid = true;
 
     $('#email').blur(function() {
         $scope.check_email_valid();
+    });
+}]);
+
+myapp.controller('UserSettingsController', ['$scope', '$rootScope', '$http', '$localStorage', '$location', '$route', 'AuthService', 'AppService', 'FileUploader', function($scope, $rootScope, $http, $localStorage, $location, $route, AuthService, AppService, FileUploader) {
+    if (!AuthService.IsLoggedIn()) {
+        $location.path('/');
+    }
+
+    $scope.submit = function() {
+        $http.put(AppService.GetAPIServer() + '/api/user', {
+                email: $scope.user.email,
+                password: $scope.user.password,
+                first_name: $scope.user.first_name,
+                last_name: $scope.user.last_name,
+                nickname: $scope.user.nickname,
+                gender: $scope.user.gender,
+                mobile_phone: $scope.user.mobile_phone
+            })
+            .success(function(response) {
+                if ($scope.uploader.queue.length == 0) {
+                    alertify.success("Your changes have been saved.");
+                    $rootScope.$broadcast("auth_changed");
+                    $route.reload()
+                    $location.path('/');
+                } else {
+                    $scope.uploader.uploadAll();
+                }
+            }).error(function(data, status, headers, config) {
+                alertify.error("Fail to save, try again later!");
+            });
+    };
+
+    $scope.choose_photo = function() {
+        $scope.uploader.clearQueue();
+    };
+
+    var uploader = $scope.uploader = new FileUploader({
+        url: AppService.GetAPIServer() + '/api/user/upload',
+        queueLimit: 1
+    });
+
+    uploader.filters.push({
+        name: 'imageFilter',
+        fn: function(item /*{File|FileLikeObject}*/, options) {
+            var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
+            return '|jpg|png|jpeg|bmp|gif|'.indexOf(type) !== -1;
+        }
+    });
+
+    uploader.onBeforeUploadItem = function(item) {
+        var formData = [{
+            user_id: $rootScope.current_user.user_id,
+        }];
+        Array.prototype.push.apply(item.formData, formData);
+    };
+
+    uploader.onCompleteAll = function() {
+        alertify.success("Your changes have been saved.");
+        $rootScope.$broadcast("auth_changed");
+        $route.reload()
+        $location.path('/');
+    };
+
+    $http.get(AppService.GetAPIServer() + '/api/user').success(function(response) {
+        $scope.user = response;
     });
 }]);
 
