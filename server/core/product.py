@@ -153,7 +153,8 @@ def search_product():
         cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
             Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
             User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
-            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), 0 \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), 0, \
+            (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
             FROM Product, User WHERE LOWER(Product.Name) LIKE %s AND \
             User.UserId = Product.UserId ORDER BY Product.Ranking,Product.CreateAt DESC \
             LIMIT %s,%s", (keyword_pattern, offset, rows_per_page))
@@ -162,7 +163,8 @@ def search_product():
             Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
             User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
             (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), \
-            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s) \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s), \
+            (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
             FROM Product, User WHERE LOWER(Product.Name) LIKE %s AND \
             User.UserId = Product.UserId ORDER BY Product.Ranking,Product.CreateAt DESC \
             LIMIT %s,%s", (str(g.user_id), keyword_pattern, offset, rows_per_page))
@@ -185,7 +187,7 @@ def search_product():
             "description": product_data[4],
             "price": product_data[5],
             "location": product_data[6],
-            "photo": "",
+            "photo": product_data[15],
             "is_sold": product_data[7],
             "likes": product_data[13],
             "is_liked": product_data[14]
@@ -357,7 +359,7 @@ def delete_product_photo(photo_id):
         os.remove(os.path.join("uploads/product", product_data[1]))
     except:
         pass
-        
+
     cur.execute("DELETE FROM Photo WHERE PhotoId = %s", (str(photo_id),))
     g.db.commit()
 

@@ -136,13 +136,15 @@ def get_user_product(user_id):
     if g.user_id is None:
         cur.execute("SELECT ProductId, UserId, Name, Category, Description, \
             Price, Location, IsSold, \
-            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), 0 \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), 0, \
+            (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
             FROM Product WHERE UserId = %s", (str(user_id),))
     else:
         cur.execute("SELECT ProductId, UserId, Name, Category, Description, \
             Price, Location, IsSold, \
             (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), \
-            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s) \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s), \
+            (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
             FROM Product WHERE UserId = %s", (str(g.user_id), str(user_id)))
     products_data = cur.fetchall()
 
@@ -155,7 +157,7 @@ def get_user_product(user_id):
             "description": product_data[4],
             "price": product_data[5],
             "location": product_data[6],
-            "photo": "",
+            "photo": product_data[10],
             "is_sold": product_data[7],
             "likes": product_data[8],
             "is_liked": product_data[9]
@@ -175,9 +177,10 @@ def get_user_review(user_id):
         User.UserId = Review.FromUserId", (str(user_id),))
     reviews_data = cur.fetchall()
 
-    cur.execute("SELECT AVG(Rating) FROM Review WHERE \
-        Review.ToUserId = %s", (str(user_id),))
-    avg_rating = float(cur.fetchone()[0])
+    cur.execute("SELECT COUNT(Rating) FROM Review WHERE \
+        Review.ToUserId = %s AND Rating = -1", (str(user_id),))
+    negative_count = cur.fetchone()[0]
+    percentage = int(round(100 - (float(negative_count) / float(len(reviews_data)) * 100.0 if len(reviews_data) > 0 else 0)))
 
     reviews = []
     for review_data in reviews_data:
@@ -197,7 +200,7 @@ def get_user_review(user_id):
         })
 
     resp_body = {
-        "average": avg_rating,
+        "percentage": percentage,
         "reviews": reviews
     }
 

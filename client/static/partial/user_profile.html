@@ -28,6 +28,7 @@
                     <div class="col-md-8">
                         <h4>{{user.first_name}} {{user.last_name}}</h4>
                         <p>@{{user.nickname}}</p>
+                        <p>{{reviews_list.percentage}}% Positive</p>
                     </div>
                 </div>
                 <div class="row">
@@ -39,9 +40,23 @@
                 </div>
             </div>
         </div>
-        <div class="panel panel-default">
+        <div class="panel panel-default" ng-show="reviews_list.reviews.length">
             <div class="panel-body">
-
+                <div ng-repeat="review in reviews_list.reviews">
+                    <div class="row">
+                        <div class="col-md-2">
+                            <img src="http://placehold.it/50/55C1E7/fff&text=U" class="img-circle"/>
+                            <!-- <small>{{review.reviewer.nickname}}</small> -->
+                        </div>
+                        <div class="col-md-10">
+                            <p>{{review.content}}</p>
+                            <small>─ {{review.reviewer.nickname}}</small>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <hr>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -58,7 +73,7 @@
                     <br/>
                     <div class="col-md-4" ng-repeat="product in products_list">
                         <div class="thumbnail">
-                            <a href="#/product/{{product.product_id}}"><img src="http://placehold.it/200x200"><a/>
+                            <a href="#/product/{{product.product_id}}"><img src="/uploads/product/{{product.photo}}" class="img-responsive center-block" style="height: 200px;"><a/>
                                 <div class="caption">
                                     <h3 class="name-truncate"><a href="#/product/{{product.product_id}}">{{product.name}}</a></h3>
                                     <p><span class="glyphicon glyphicon-usd" aria-hidden="true"></span> {{product.price}}</p>

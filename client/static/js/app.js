@@ -615,6 +615,11 @@ myapp.controller('UserProfileController', ['$scope', '$rootScope', '$localStorag
     $http.get(AppService.GetAPIServer() + '/api/user/' + $scope.userId + "/following").success(function(response) {
         $scope.followings_list = response
     });
+
+    $http.get(AppService.GetAPIServer() + '/api/user/' + $scope.userId + "/review").success(function(response) {
+        $scope.reviews_list = response
+        $("#user_rating").value("3");
+    });
 }]);
 
 myapp.controller('WantlistController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $location, $route, AuthService, AppService) {
@@ -751,7 +756,7 @@ myapp.controller('MyBidsController', ['$scope', '$rootScope', '$http', '$locatio
     $scope.submit_review = function() {
         $http.post(AppService.GetAPIServer() + '/api/user/' + $scope.current_review.user_id + '/review', {
                 "bid_id": $scope.current_review.bid_id,
-                "rating": $("#new_rating").val(),
+                "rating": parseInt($("#new_rating").val()),
                 "content": $("#new_review").val()
             }).success(function(response) {
                 for (var i = 0; i < $scope.bids_list.bids.length; i++) {
