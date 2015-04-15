@@ -11,8 +11,11 @@ product = Blueprint("product", __name__)
 def get_products(category):
     page = request.args.get("page")
     page = 1 if page is None else int(page)
-    rows_per_page = 30
+    rows_per_page = 4
     offset = rows_per_page * (page - 1)
+
+    if page <= 0:
+        abort(400)
 
     cur = g.db.cursor()
     if g.user_id is None:
@@ -36,9 +39,15 @@ def get_products(category):
             LIMIT %s,%s", (str(g.user_id), category, offset, rows_per_page))
     products_data = cur.fetchall()
 
-    resp_body = []
+    cur.execute("SELECT COUNT(Product.ProductId) FROM Product WHERE Product.Category \
+        = %s", (category, ))
+    total_pages = cur.fetchone()[0] / rows_per_page + 1
+
+    resp_body = {}
+    resp_body["total_pages"] = total_pages
+    resp_body["results"] = []
     for product_data in products_data:
-        resp_body.append({
+        resp_body["results"].append({
             "product_id": product_data[0],
             "seller": {
                 "user_id": product_data[1],
@@ -145,7 +154,7 @@ def search_product():
     keyword_pattern = "%" + request.args.get("keyword").lower() + "%"
     page = request.args.get("page")
     page = 1 if page is None else int(page)
-    rows_per_page = 30
+    rows_per_page = 4
     offset = rows_per_page * (page - 1)
 
     cur = g.db.cursor()
@@ -170,9 +179,15 @@ def search_product():
             LIMIT %s,%s", (str(g.user_id), keyword_pattern, offset, rows_per_page))
     products_data = cur.fetchall()
 
-    resp_body = []
+    cur.execute("SELECT COUNT(Product.ProductId) FROM Product WHERE LOWER(Product.Name) \
+        LIKE %s", (keyword_pattern,))
+    total_pages = cur.fetchone()[0] / rows_per_page + 1
+
+    resp_body = {}
+    resp_body["total_pages"] = total_pages
+    resp_body["results"] = []
     for product_data in products_data:
-        resp_body.append({
+        resp_body["results"].append({
             "product_id": product_data[0],
             "seller": {
                 "user_id": product_data[1],

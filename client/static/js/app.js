@@ -31,6 +31,10 @@ var myapp = angular.module('myApp', ['ngStorage', 'ngRoute', 'angularFileUpload'
                 templateUrl: 'static/partial/product_category.html',
                 controller: 'ProductCategoryController'
             })
+            .when('/product/all/:category/:pageno', {
+                templateUrl: 'static/partial/product_category.html',
+                controller: 'ProductCategoryController'
+            })
             .when('/product/sell', {
                 templateUrl: 'static/partial/product_sell.html',
                 controller: 'ProductSellController'
@@ -415,6 +419,11 @@ myapp.controller('UserSettingsController', ['$scope', '$rootScope', '$http', '$l
 myapp.controller('ProductCategoryController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
     $scope.categoryId = $route.current.params.category;
     $scope.categoryName = AppService.GetCategoryName($scope.categoryId);
+    if ($route.current.params.pageno != null) {
+        $scope.currentPage = parseInt($route.current.params.pageno);
+    } else {
+        $scope.currentPage = 1
+    }
 
     $scope.like = function(product) {
         $http.put(AppService.GetAPIServer() + '/api/product/' + product.product_id + "/like").success(function(response) {
@@ -428,8 +437,39 @@ myapp.controller('ProductCategoryController', ['$scope', '$http', '$location', '
         });
     };
 
-    $http.get(AppService.GetAPIServer() + '/api/product/category/' + $scope.categoryId).success(function(response) {
-        $scope.products_list = response
+    $scope.set_pagination_bar = function() {
+        $scope.isFirstPage = $scope.currentPage == 1;
+        $scope.isLastPage = $scope.currentPage == $scope.totalPages;
+        $scope.paginationBar = []
+
+        var pagebar_start = 0, pagebar_end = 0;
+
+        if ($scope.totalPages < 5) {
+            pagebar_start = 1;
+            pagebar_end = $scope.totalPages;
+        } else if ($scope.currentPage <= 5) {
+            pagebar_start = 1;
+            pagebar_end = 5;
+        } else if ($scope.currentPage > $scope.totalPages - 4) {
+            pagebar_start = $scope.totalPages - 4;
+            pagebar_end = $scope.totalPages;
+        } else {
+            pagebar_start = $scope.currentPage - 2;
+            pagebar_end = $scope.currentPage + 2;
+        }
+
+        for (var i = pagebar_start; i <= pagebar_end; i++) {
+            $scope.paginationBar.push({
+                page: i,
+                current: i == $scope.currentPage
+            });
+        }
+    };
+
+    $http.get(AppService.GetAPIServer() + '/api/product/category/' + $scope.categoryId + '?page=' + $scope.currentPage).success(function(response) {
+        $scope.products_list = response.results;
+        $scope.totalPages = response.total_pages;
+        $scope.set_pagination_bar();
     });
 }]);
 
@@ -655,6 +695,11 @@ myapp.controller('ProductEditController', ['$scope', '$rootScope', '$http', '$lo
 
 myapp.controller('ProductQueryController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
     $scope.keyword = $location.search().keyword
+    if ($location.search().page != null) {
+        $scope.currentPage = parseInt($location.search().page);
+    } else {
+        $scope.currentPage = 1;
+    }
 
     $scope.like = function(product) {
         $http.put(AppService.GetAPIServer() + '/api/product/' + product.product_id + "/like").success(function(response) {
@@ -668,8 +713,39 @@ myapp.controller('ProductQueryController', ['$scope', '$http', '$location', '$ro
         });
     };
 
-    $http.get(AppService.GetAPIServer() + '/api/product/query?keyword=' + $scope.keyword).success(function(response) {
-        $scope.products_list = response
+    $scope.set_pagination_bar = function() {
+        $scope.isFirstPage = $scope.currentPage == 1;
+        $scope.isLastPage = $scope.currentPage == $scope.totalPages;
+        $scope.paginationBar = []
+
+        var pagebar_start = 0, pagebar_end = 0;
+
+        if ($scope.totalPages < 5) {
+            pagebar_start = 1;
+            pagebar_end = $scope.totalPages;
+        } else if ($scope.currentPage <= 5) {
+            pagebar_start = 1;
+            pagebar_end = 5;
+        } else if ($scope.currentPage > $scope.totalPages - 4) {
+            pagebar_start = $scope.totalPages - 4;
+            pagebar_end = $scope.totalPages;
+        } else {
+            pagebar_start = $scope.currentPage - 2;
+            pagebar_end = $scope.currentPage + 2;
+        }
+
+        for (var i = pagebar_start; i <= pagebar_end; i++) {
+            $scope.paginationBar.push({
+                page: i,
+                current: i == $scope.currentPage
+            });
+        }
+    };
+
+    $http.get(AppService.GetAPIServer() + '/api/product/query?keyword=' + $scope.keyword + '&page=' + $scope.currentPage).success(function(response) {
+        $scope.products_list = response.results;
+        $scope.totalPages = response.total_pages;
+        $scope.set_pagination_bar();
     });
 }]);
 
