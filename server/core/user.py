@@ -139,14 +139,14 @@ def get_user_product(user_id):
             Price, Location, IsSold, \
             (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), 0, \
             (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
-            FROM Product WHERE UserId = %s", (str(user_id),))
+            FROM Product WHERE UserId = %s ORDER BY Product.IsSold ASC", (str(user_id),))
     else:
         cur.execute("SELECT ProductId, UserId, Name, Category, Description, \
             Price, Location, IsSold, \
             (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), \
             (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s), \
             (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
-            FROM Product WHERE UserId = %s", (str(g.user_id), str(user_id)))
+            FROM Product WHERE UserId = %s ORDER BY Product.IsSold ASC", (str(g.user_id), str(user_id)))
     products_data = cur.fetchall()
 
     resp_body = []

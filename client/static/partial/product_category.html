@@ -18,7 +18,7 @@
                 <div class="caption">
                     <h3 class="name-truncate"><a href="#/product/{{product.product_id}}">{{product.name}}</a></h3>
                     <p><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <a href="#/user/{{product.seller.user_id}}">{{product.seller.nickname}}</a></p>
-                    <p><span class="glyphicon glyphicon-usd" aria-hidden="true"></span> {{product.price}}</p>
+                    <p><span class="glyphicon glyphicon-usd" aria-hidden="true"></span> {{product.price}} <span class="label label-danger" ng-show="product.is_sold">Sold</span></p>
                     <p>
                         <button type="button" ng-click="like(product)" ng-class="{0: 'btn btn-default', 1: 'btn btn-danger'}[product.is_liked]" aria-label="Left Align">
                             <span ng-class="{0: 'glyphicon glyphicon-heart-empty', 1: 'glyphicon glyphicon-heart'}[product.is_liked]" aria-hidden="true"></span>

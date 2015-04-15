@@ -488,6 +488,16 @@ myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$
         });
     };
 
+    $scope.toggle_sold = function() {
+        $http.put(AppService.GetAPIServer() + '/api/product/' + $scope.productId + "/sold").success(function(response) {
+            if ($scope.product.is_sold != 1 && response.sold) {
+                $scope.product.is_sold = 1;
+            } else if ($scope.product.is_sold == 1 && !response.sold) {
+                $scope.product.is_sold = 0;
+            }
+        });
+    }
+
     $scope.respond = function(comment) {
         $scope.current_comment = comment;
         $("#new_response").val(comment.response);

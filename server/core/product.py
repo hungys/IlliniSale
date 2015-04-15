@@ -25,7 +25,7 @@ def get_products(category):
             (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), 0 , \
             (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
             FROM Product, User WHERE Product.Category = %s AND \
-            User.UserId = Product.UserId ORDER BY Product.Ranking,Product.CreateAt DESC \
+            User.UserId = Product.UserId ORDER BY Product.IsSold ASC, Product.CreateAt DESC \
             LIMIT %s,%s", (category, offset, rows_per_page))
     else:
         cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
@@ -35,7 +35,7 @@ def get_products(category):
             (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s), \
             (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
             FROM Product, User WHERE Product.Category = %s AND \
-            User.UserId = Product.UserId ORDER BY Product.Ranking,Product.CreateAt DESC \
+            User.UserId = Product.UserId ORDER BY Product.IsSold ASC, Product.CreateAt DESC \
             LIMIT %s,%s", (str(g.user_id), category, offset, rows_per_page))
     products_data = cur.fetchall()
 
@@ -165,7 +165,7 @@ def search_product():
             (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), 0, \
             (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
             FROM Product, User WHERE LOWER(Product.Name) LIKE %s AND \
-            User.UserId = Product.UserId ORDER BY Product.Ranking,Product.CreateAt DESC \
+            User.UserId = Product.UserId ORDER BY Product.IsSold ASC, Product.CreateAt DESC \
             LIMIT %s,%s", (keyword_pattern, offset, rows_per_page))
     else:
         cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
@@ -175,7 +175,7 @@ def search_product():
             (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s), \
             (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
             FROM Product, User WHERE LOWER(Product.Name) LIKE %s AND \
-            User.UserId = Product.UserId ORDER BY Product.Ranking,Product.CreateAt DESC \
+            User.UserId = Product.UserId ORDER BY Product.IsSold ASC, Product.CreateAt DESC \
             LIMIT %s,%s", (str(g.user_id), keyword_pattern, offset, rows_per_page))
     products_data = cur.fetchall()
 
@@ -346,6 +346,33 @@ def toggle_product_like(product_id):
     g.db.commit()
 
     resp_body = {"liked": not is_liked}
+
+    resp = make_response(json.dumps(resp_body), 200)
+    resp.headers["Content-Type"] = "application/json"
+    return resp
+
+@product.route('/product/<int:product_id>/sold', methods=['PUT'])
+@auth.login_required
+def toggle_product_sold(product_id):
+    cur = g.db.cursor()
+    cur.execute("SELECT ProductId, IsSold FROM Product WHERE ProductId = %s AND UserId = %s", (str(product_id), str(g.user_id)))
+    product_data = cur.fetchone()
+
+    if product_data is None:
+        abort(404)
+
+    is_sold = product_data[1] == 1
+
+    if is_sold:
+        cur.execute("UPDATE Product SET IsSold = 0 WHERE ProductId = %s", (str(product_id), ))
+        is_sold = False
+    else:
+        cur.execute("UPDATE Product SET IsSold = 1 WHERE ProductId = %s", (str(product_id), ))
+        is_sold = True
+
+    g.db.commit()
+
+    resp_body = {"sold": is_sold}
 
     resp = make_response(json.dumps(resp_body), 200)
     resp.headers["Content-Type"] = "application/json"

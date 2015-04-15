@@ -46,11 +46,11 @@
     <div class="col-md-5">
         <div class="panel panel-default">
             <div class="panel-body">
-                <h3><div class="dropdown">{{product.name}} <button type="button" class="btn btn-default dropdown-toggle" id="btn_manage" data-toggle="dropdown" aria-expanded="true" ng-show="product.is_owner">
+                <h3><div class="dropdown">{{product.name}} <span class="label label-danger" ng-show="product.is_sold">Sold out</span> <button type="button" class="btn btn-default dropdown-toggle" id="btn_manage" data-toggle="dropdown" aria-expanded="true" ng-show="product.is_owner">
   <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
 </button><ul class="dropdown-menu" role="menu" aria-labelledby="btn_manage">
     <li role="presentation"><a role="menuitem" tabindex="-1" href="#/product/{{product.product_id}}/edit">Edit</a></li>
-    <li role="presentation"><a role="menuitem" tabindex="-1" href="">Mark as sold</a></li>
+    <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="toggle_sold()">{{product.is_sold ? 'Mark as unsold' : 'Mark as sold'}}</a></li>
     <!-- <li role="presentation"><a role="menuitem" tabindex="-1" href="">Delete</a></li> -->
   </ul></div></h3>
                 <p><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <a href="#/user/{{product.seller.user_id}}">{{product.seller.nickname}}</a></p>
@@ -60,7 +60,7 @@
                 <p><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> ${{product.price}}</p>
                 <p><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {{product.location}}</p>
                 <p>
-                    <button type="button" ng-hide="product.is_owner" class="btn btn-primary" data-toggle="modal" data-target="#modal_bid">Bid to buy</button>
+                    <button type="button" ng-hide="product.is_owner || product.is_sold" class="btn btn-primary" data-toggle="modal" data-target="#modal_bid" ng-hide="product.is_sold==1">Bid to buy</button>
                 </p>
                 <p>
                     <button type="button" ng-class="{1: 'btn btn-danger', 0: 'btn btn-default'}[product.is_liked]" ng-click="like()" ng-hide="product.is_liked">Like this ({{product.likes}})</button>
