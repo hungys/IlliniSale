@@ -22,20 +22,20 @@ def get_products(category):
         cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
             Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
             User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
-            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), 0 , \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId) AS LikesCount, 0 , \
             (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
             FROM Product, User WHERE Product.Category = %s AND \
-            User.UserId = Product.UserId ORDER BY Product.IsSold ASC, Product.CreateAt DESC \
+            User.UserId = Product.UserId ORDER BY Product.IsSold ASC, LikesCount DESC, Product.CreateAt DESC \
             LIMIT %s,%s", (category, offset, rows_per_page))
     else:
         cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
             Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
             User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
-            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId) AS LikesCount, \
             (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s), \
             (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
             FROM Product, User WHERE Product.Category = %s AND \
-            User.UserId = Product.UserId ORDER BY Product.IsSold ASC, Product.CreateAt DESC \
+            User.UserId = Product.UserId ORDER BY Product.IsSold ASC, LikesCount DESC, Product.CreateAt DESC \
             LIMIT %s,%s", (str(g.user_id), category, offset, rows_per_page))
     products_data = cur.fetchall()
 
@@ -162,20 +162,20 @@ def search_product():
         cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
             Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
             User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
-            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), 0, \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId) AS LikesCount, 0, \
             (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
             FROM Product, User WHERE LOWER(Product.Name) LIKE %s AND \
-            User.UserId = Product.UserId ORDER BY Product.IsSold ASC, Product.CreateAt DESC \
+            User.UserId = Product.UserId ORDER BY Product.IsSold ASC, LikesCount DESC, Product.CreateAt DESC \
             LIMIT %s,%s", (keyword_pattern, offset, rows_per_page))
     else:
         cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
             Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
             User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
-            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId) AS LikesCount, \
             (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s), \
             (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
             FROM Product, User WHERE LOWER(Product.Name) LIKE %s AND \
-            User.UserId = Product.UserId ORDER BY Product.IsSold ASC, Product.CreateAt DESC \
+            User.UserId = Product.UserId ORDER BY Product.IsSold ASC, LikesCount DESC, Product.CreateAt DESC \
             LIMIT %s,%s", (str(g.user_id), keyword_pattern, offset, rows_per_page))
     products_data = cur.fetchall()
 
