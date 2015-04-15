@@ -6,15 +6,19 @@
     <script src="static/bower_components/jquery/dist/jquery.js"></script>
     <script src="static/bower_components/alertify.js/lib/alertify.js"></script>
     <script src="static/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="static/bower_components/typeahead.js/dist/typeahead.jquery.js"></script>
+    <script src="static/bower_components/typeahead.js/dist/bloodhound.js"></script>
     <script src="static/bower_components/angular/angular.js"></script>
     <script src="static/bower_components/ngstorage/ngStorage.js"></script>
     <script src="static/bower_components/angular-route/angular-route.js"></script>
     <script src="static/bower_components/angular-file-upload/angular-file-upload.js"></script>
     <script src="static/js/app.js"></script>
+    <script src="static/js/auto_complete.js"></script>
     <link rel="stylesheet" href="static/bower_components/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="static/bower_components/alertify.js/themes/alertify.core.css">
     <link rel="stylesheet" href="static/bower_components/alertify.js/themes/alertify.bootstrap.css">
     <link rel="stylesheet" href="static/css/sticky-footer.css">
+    <link rel="stylesheet" href="static/css/typeaheadjs.css">
     <style>
         body {
             padding-top: 40px;
@@ -45,7 +49,7 @@
                 </ul>
                 <form ng-submit="search()" class="navbar-form navbar-left" role="search">
                     <div class="form-group">
-                        <input id="navbar_search" type="text" class="form-control" placeholder="Search for products" required>
+                        <input id="navbar_search" type="text" class="form-control typeahead" placeholder="Search for products" required>
                     </div>
                     <button type="submit" class="btn btn-default" aria-label="Left Align">
                         <span class="glyphicon glyphicon-search" aria-hidden="true"></span>

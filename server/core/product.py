@@ -1,4 +1,4 @@
-from flask import Blueprint, g, make_response, abort, request
+from flask import Blueprint, g, make_response, abort, request, current_app
 from werkzeug import secure_filename
 from core.permission import auth
 import json
@@ -192,6 +192,15 @@ def search_product():
             "likes": product_data[13],
             "is_liked": product_data[14]
         })
+
+    resp = make_response(json.dumps(resp_body), 200)
+    resp.headers["Content-Type"] = "application/json"
+    return resp
+
+@product.route('/product/query/autocomplete', methods=['GET'])
+def autocomplete():
+    keyword = request.args.get("keyword")
+    resp_body = current_app.autocomplete_provider.autocomplete(keyword)
 
     resp = make_response(json.dumps(resp_body), 200)
     resp.headers["Content-Type"] = "application/json"

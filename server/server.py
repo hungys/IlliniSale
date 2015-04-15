@@ -4,6 +4,7 @@ from tornado.ioloop import IOLoop
 from flask import Flask, g, request, make_response
 from core.database import connect_db
 from core.permission import auth
+from core.auto_complete import AutoCompleteProvider
 import json
 import jwt
 import config
@@ -22,6 +23,9 @@ from core.bid import bid
 app.register_blueprint(bid, url_prefix="/api")
 from core.comment import comment
 app.register_blueprint(comment, url_prefix="/api")
+
+app.autocomplete_provider = AutoCompleteProvider()
+app.autocomplete_provider.load_candidates()
 
 @app.before_request
 def before_request():
