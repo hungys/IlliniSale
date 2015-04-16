@@ -159,11 +159,11 @@ def search_product():
     keyword_pattern = "%" + keyword_arg + "%"
     page = request.args.get("page")
     page = 1 if page is None else int(page)
-    rows_per_page = 4
+    rows_per_page = 3
     offset = rows_per_page * (page - 1)
 
     cur = g.db.cursor()
-    if category_arg != "":
+    if category_arg != "" and category_arg != "all":
         if g.user_id is None:
             cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
                 Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \

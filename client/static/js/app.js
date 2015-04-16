@@ -715,7 +715,7 @@ myapp.controller('ProductQueryController', ['$scope', '$rootScope', '$http', '$l
     if ($location.search().category != null) {
         $scope.criteria_category = $location.search().category
     } else {
-        $scope.criteria_category = ""
+        $scope.criteria_category = "all"
     }
 
     if ($location.search().min_price != null) {
@@ -777,6 +777,26 @@ myapp.controller('ProductQueryController', ['$scope', '$rootScope', '$http', '$l
         }
     };
 
+    $scope.navigate_previous = function() {
+        if ($scope.currentPage != 1) {
+            $location.search('page', $scope.currentPage - 1);
+        } else {
+            $location.search('page', 1);
+        }
+    }
+
+    $scope.navigate_to = function(page) {
+        $location.search('page', page);
+    }
+
+    $scope.navigate_next = function() {
+        if ($scope.currentPage != $scope.totalPages) {
+            $location.search('page', $scope.currentPage + 1);
+        } else {
+            $location.search('page', $scope.totalPages);
+        }
+    }
+
     $scope.search = function() {
         $location.path('/product/query').search({
             'keyword': $scope.criteria_keyword,
@@ -786,8 +806,8 @@ myapp.controller('ProductQueryController', ['$scope', '$rootScope', '$http', '$l
         });
     };
 
-    $scope.category_list = $rootScope.category_list;
-    // $scope.category_list.splice(0, 0, {id: "all", name: "All"});
+    $scope.category_list = $rootScope.category_list.slice();
+    $scope.category_list.splice(0, 0, {id: "all", name: "All"});
 
     $http.get(AppService.GetAPIServer() + '/api/product/query?keyword=' + $scope.criteria_keyword + '&category=' + $scope.criteria_category + '&price_low=' + $scope.criteria_min_price + '&price_high=' + $scope.criteria_max_price + '&page=' + $scope.currentPage).success(function(response) {
         $scope.products_list = response.results;

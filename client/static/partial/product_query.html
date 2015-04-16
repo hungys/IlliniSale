@@ -59,13 +59,13 @@
             <nav>
                 <ul class="pagination align-center">
                     <li ng-class="{false: '', true: 'disabled'}[isFirstPage]">
-                        <a ng-href="#/product/query?keyword={{keyword}}&page={{currentPage != 1 ? currentPage-1 : 1}}" aria-label="Previous">
+                        <a href="" ng-click="navigate_previous()" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
-                    <li ng-repeat="page in paginationBar" ng-class="{false: '', true: 'active'}[page.current]"><a href="#/product/query?keyword={{keyword}}&page={{page.page}}">{{page.page}}</a></li>
+                    <li ng-repeat="page in paginationBar" ng-class="{false: '', true: 'active'}[page.current]"><a href="" ng-click="navigate_to(page.page)">{{page.page}}</a></li>
                     <li ng-class="{false: '', true: 'disabled'}[isLastPage]">
-                        <a ng-href="#/product/query?keyword={{keyword}}&page={{currentPage != totalPages ? currentPage+1 : totalPages}}" aria-label="Next">
+                        <a href="" ng-click="navigate_next()" aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
