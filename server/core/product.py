@@ -151,37 +151,76 @@ def get_product(product_id):
 
 @product.route('/product/query', methods=['GET'])
 def search_product():
-    keyword_pattern = "%" + request.args.get("keyword").lower() + "%"
+    keyword_arg = request.args.get("keyword") if "keyword" in request.args else ""
+    price_low_arg = int(request.args.get("price_low")) if "price_low" in request.args and request.args.get("price_low") != "" else 0
+    price_high_arg = int(request.args.get("price_high")) if "price_high" in request.args and request.args.get("price_high") != "" else 100000
+    category_arg = request.args.get("category") if "category" in request.args else ""
+
+    keyword_pattern = "%" + keyword_arg + "%"
     page = request.args.get("page")
     page = 1 if page is None else int(page)
     rows_per_page = 4
     offset = rows_per_page * (page - 1)
 
     cur = g.db.cursor()
-    if g.user_id is None:
-        cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
-            Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
-            User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
-            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId) AS LikesCount, 0, \
-            (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
-            FROM Product, User WHERE LOWER(Product.Name) LIKE %s AND \
-            User.UserId = Product.UserId ORDER BY Product.IsSold ASC, LikesCount DESC, Product.CreateAt DESC \
-            LIMIT %s,%s", (keyword_pattern, offset, rows_per_page))
-    else:
-        cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
-            Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
-            User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
-            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId) AS LikesCount, \
-            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s), \
-            (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
-            FROM Product, User WHERE LOWER(Product.Name) LIKE %s AND \
-            User.UserId = Product.UserId ORDER BY Product.IsSold ASC, LikesCount DESC, Product.CreateAt DESC \
-            LIMIT %s,%s", (str(g.user_id), keyword_pattern, offset, rows_per_page))
-    products_data = cur.fetchall()
+    if category_arg != "":
+        if g.user_id is None:
+            cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
+                Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
+                User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
+                (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId) AS LikesCount, 0, \
+                (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
+                FROM Product, User WHERE LOWER(Product.Name) LIKE %s AND \
+                User.UserId = Product.UserId AND Product.Category = %s AND \
+                Product.Price >= %s AND Product.Price <= %s \
+                ORDER BY Product.IsSold ASC, LikesCount DESC, Product.CreateAt DESC \
+                LIMIT %s,%s", (keyword_pattern, category_arg, str(price_low_arg), str(price_high_arg), offset, rows_per_page))
+        else:
+            cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
+                Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
+                User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
+                (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId) AS LikesCount, \
+                (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s), \
+                (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
+                FROM Product, User WHERE LOWER(Product.Name) LIKE %s AND \
+                User.UserId = Product.UserId AND Product.Category = %s AND \
+                Product.Price >= %s AND Product.Price <= %s \
+                ORDER BY Product.IsSold ASC, LikesCount DESC, Product.CreateAt DESC \
+                LIMIT %s,%s", (str(g.user_id), keyword_pattern, category_arg, str(price_low_arg), str(price_high_arg), offset, rows_per_page))
+        products_data = cur.fetchall()
 
-    cur.execute("SELECT COUNT(Product.ProductId) FROM Product WHERE LOWER(Product.Name) \
-        LIKE %s", (keyword_pattern,))
-    total_pages = cur.fetchone()[0] / rows_per_page + 1
+        cur.execute("SELECT COUNT(Product.ProductId) FROM Product \
+            WHERE LOWER(Product.Name) LIKE %s AND Product.Category = %s \
+            AND Product.Price >= %s AND Product.Price <= %s", (keyword_pattern, category_arg, str(price_low_arg), str(price_high_arg)))
+        total_pages = cur.fetchone()[0] / rows_per_page + 1
+    else:
+        if g.user_id is None:
+            cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
+                Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
+                User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
+                (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId) AS LikesCount, 0, \
+                (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
+                FROM Product, User WHERE LOWER(Product.Name) LIKE %s AND \
+                User.UserId = Product.UserId AND Product.Price >= %s AND Product.Price <= %s \
+                ORDER BY Product.IsSold ASC, LikesCount DESC, Product.CreateAt DESC \
+                LIMIT %s,%s", (keyword_pattern, str(price_low_arg), str(price_high_arg), offset, rows_per_page))
+        else:
+            cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
+                Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
+                User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
+                (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId) AS LikesCount, \
+                (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s), \
+                (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
+                FROM Product, User WHERE LOWER(Product.Name) LIKE %s AND \
+                User.UserId = Product.UserId AND Product.Price >= %s AND Product.Price <= %s \
+                ORDER BY Product.IsSold ASC, LikesCount DESC, Product.CreateAt DESC \
+                LIMIT %s,%s", (str(g.user_id), keyword_pattern, str(price_low_arg), str(price_high_arg), offset, rows_per_page))
+        products_data = cur.fetchall()
+
+        cur.execute("SELECT COUNT(Product.ProductId) FROM Product \
+            WHERE LOWER(Product.Name) LIKE %s \
+            AND Product.Price >= %s AND Product.Price <= %s", (keyword_pattern, str(price_low_arg), str(price_high_arg)))
+        total_pages = cur.fetchone()[0] / rows_per_page + 1
 
     resp_body = {}
     resp_body["total_pages"] = total_pages

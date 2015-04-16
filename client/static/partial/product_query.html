@@ -1,9 +1,9 @@
 <style>
     .name-truncate {
-      width: 240px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+        width: 240px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 </style>
 
@@ -12,36 +12,65 @@
 </div>
 
 <div class="row">
-    <div class="col-md-3" ng-repeat="product in products_list">
-        <div class="thumbnail">
-            <a href="#/product/{{product.product_id}}"><img src="/uploads/product/{{product.photo}}" class="img-responsive center-block" style="height: 240px;"><a/>
-                <div class="caption">
-                    <h3 class="name-truncate"><a href="#/product/{{product.product_id}}">{{product.name}}</a></h3>
-                    <p><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <a href="#/user/{{product.seller.user_id}}">{{product.seller.nickname}}</a></p>
-                    <p><span class="glyphicon glyphicon-usd" aria-hidden="true"></span> {{product.price}} <span class="label label-danger" ng-show="product.is_sold">Sold</span></p>
-                    <p>
-                        <button type="button" ng-click="like(product)" ng-class="{0: 'btn btn-default', 1: 'btn btn-danger'}[product.is_liked]" aria-label="Left Align">
-                            <span ng-class="{0: 'glyphicon glyphicon-heart-empty', 1: 'glyphicon glyphicon-heart'}[product.is_liked]" aria-hidden="true"></span>
-                        </button> {{product.likes}} user liked</p>
-                </div>
+    <div class="col-md-3">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <form ng-submit="search()">
+                    <div class="form-group">
+                        <label for="keyword">Keyword</label>
+                        <input type="text" class="form-control" id="keyword" ng-model="criteria_keyword">
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select class="form-control" id="category" ng-model="criteria_category" ng-options="category.id as category.name for category in category_list"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="price_low">Min Price</label>
+                        <input type="number" class="form-control" id="price_low" ng-model="criteria_min_price">
+                    </div>
+                    <div class="form-group">
+                        <label for="price_high">Max Price</label>
+                        <input type="number" class="form-control" id="price_high" ng-model="criteria_max_price">
+                    </div>
+                    <button type="submit" class="btn btn-default">Search</button>
+                </form>
+            </div>
         </div>
     </div>
-</div>
+    <div class="col-md-9">
+        <div class="row">
+            <div class="col-md-4" ng-repeat="product in products_list">
+                <div class="thumbnail">
+                    <a href="#/product/{{product.product_id}}"><img src="/uploads/product/{{product.photo}}" class="img-responsive center-block" style="height: 240px;"><a/>
+                        <div class="caption">
+                            <h3 class="name-truncate"><a href="#/product/{{product.product_id}}">{{product.name}}</a></h3>
+                            <p><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <a href="#/user/{{product.seller.user_id}}">{{product.seller.nickname}}</a></p>
+                            <p><span class="glyphicon glyphicon-usd" aria-hidden="true"></span> {{product.price}} <span class="label label-danger" ng-show="product.is_sold">Sold</span></p>
+                            <p>
+                                <button type="button" ng-click="like(product)" ng-class="{0: 'btn btn-default', 1: 'btn btn-danger'}[product.is_liked]" aria-label="Left Align">
+                                    <span ng-class="{0: 'glyphicon glyphicon-heart-empty', 1: 'glyphicon glyphicon-heart'}[product.is_liked]" aria-hidden="true"></span>
+                                </button> {{product.likes}} user liked</p>
+                        </div>
+                </div>
+            </div>
+        </div>
 
-<div class="text-center">
-    <nav>
-        <ul class="pagination align-center">
-            <li ng-class="{false: '', true: 'disabled'}[isFirstPage]">
-                <a ng-href="#/product/query?keyword={{keyword}}&page={{currentPage != 1 ? currentPage-1 : 1}}" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                </a>
-            </li>
-            <li ng-repeat="page in paginationBar" ng-class="{false: '', true: 'active'}[page.current]"><a href="#/product/query?keyword={{keyword}}&page={{page.page}}">{{page.page}}</a></li>
-            <li ng-class="{false: '', true: 'disabled'}[isLastPage]">
-                <a ng-href="#/product/query?keyword={{keyword}}&page={{currentPage != totalPages ? currentPage+1 : totalPages}}" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
+        <div class="text-center">
+            <nav>
+                <ul class="pagination align-center">
+                    <li ng-class="{false: '', true: 'disabled'}[isFirstPage]">
+                        <a ng-href="#/product/query?keyword={{keyword}}&page={{currentPage != 1 ? currentPage-1 : 1}}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li ng-repeat="page in paginationBar" ng-class="{false: '', true: 'active'}[page.current]"><a href="#/product/query?keyword={{keyword}}&page={{page.page}}">{{page.page}}</a></li>
+                    <li ng-class="{false: '', true: 'disabled'}[isLastPage]">
+                        <a ng-href="#/product/query?keyword={{keyword}}&page={{currentPage != totalPages ? currentPage+1 : totalPages}}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
 </div>

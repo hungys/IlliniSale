@@ -703,8 +703,33 @@ myapp.controller('ProductEditController', ['$scope', '$rootScope', '$http', '$lo
     });
 }]);
 
-myapp.controller('ProductQueryController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
-    $scope.keyword = $location.search().keyword
+myapp.controller('ProductQueryController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $location, $route, AuthService, AppService) {
+    if ($location.search().keyword != null) {
+        $scope.criteria_keyword = $location.search().keyword
+        $scope.keyword = $location.search().keyword
+    } else {
+        $scope.criteria_keyword = ""
+        $scope.keyword = ""
+    }
+
+    if ($location.search().category != null) {
+        $scope.criteria_category = $location.search().category
+    } else {
+        $scope.criteria_category = ""
+    }
+
+    if ($location.search().min_price != null) {
+        $scope.criteria_min_price = parseInt($location.search().min_price)
+    } else {
+        $scope.criteria_min_price = ""
+    }
+
+    if ($location.search().max_price != null) {
+        $scope.criteria_max_price = parseInt($location.search().max_price)
+    } else {
+        $scope.criteria_max_price = ""
+    }
+
     if ($location.search().page != null) {
         $scope.currentPage = parseInt($location.search().page);
     } else {
@@ -752,7 +777,19 @@ myapp.controller('ProductQueryController', ['$scope', '$http', '$location', '$ro
         }
     };
 
-    $http.get(AppService.GetAPIServer() + '/api/product/query?keyword=' + $scope.keyword + '&page=' + $scope.currentPage).success(function(response) {
+    $scope.search = function() {
+        $location.path('/product/query').search({
+            'keyword': $scope.criteria_keyword,
+            'category': $scope.criteria_category,
+            'min_price': $scope.criteria_min_price,
+            'max_price': $scope.criteria_max_price
+        });
+    };
+
+    $scope.category_list = $rootScope.category_list;
+    // $scope.category_list.splice(0, 0, {id: "all", name: "All"});
+
+    $http.get(AppService.GetAPIServer() + '/api/product/query?keyword=' + $scope.criteria_keyword + '&category=' + $scope.criteria_category + '&price_low=' + $scope.criteria_min_price + '&price_high=' + $scope.criteria_max_price + '&page=' + $scope.currentPage).success(function(response) {
         $scope.products_list = response.results;
         $scope.totalPages = response.total_pages;
         $scope.set_pagination_bar();
