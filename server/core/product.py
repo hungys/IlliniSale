@@ -455,6 +455,139 @@ def delete_product_photo(photo_id):
 
     return '', 200
 
+@product.route('/product/landing', methods=['GET'])
+def get_landing_page():
+    resp_body = {}
+
+    cur = g.db.cursor()
+    if g.user_id is None:
+        cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
+            Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
+            User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId) AS LikesCount, 0 , \
+            (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
+            FROM Product, User WHERE Product.IsSold = 0 AND \
+            User.UserId = Product.UserId ORDER BY Product.CreateAt DESC \
+            LIMIT 8")
+    else:
+        cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
+            Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
+            User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId) AS LikesCount, \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s), \
+            (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
+            FROM Product, User WHERE Product.IsSold = 0 AND \
+            User.UserId = Product.UserId ORDER BY Product.CreateAt DESC \
+            LIMIT 8", (str(g.user_id), ))
+    products_data = cur.fetchall()
+
+    resp_body["latest"] = []
+    for product_data in products_data:
+        resp_body["latest"].append({
+            "product_id": product_data[0],
+            "seller": {
+                "user_id": product_data[1],
+                "nickname": product_data[8],
+                "first_name": product_data[9],
+                "last_name": product_data[10],
+                "profile_pic": product_data[11],
+                "gender": product_data[12]
+            },
+            "name": product_data[2],
+            "category": product_data[3],
+            "description": product_data[4],
+            "price": product_data[5],
+            "location": product_data[6],
+            "photo": product_data[15],
+            "is_sold": product_data[7],
+            "likes": product_data[13],
+            "is_liked": product_data[14]
+        })
+
+    if g.user_id is None:
+        cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
+            Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
+            User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId) AS LikesCount, 0 , \
+            (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
+            FROM Product, User WHERE Product.IsSold = 0 AND \
+            User.UserId = Product.UserId ORDER BY LikesCount DESC \
+            LIMIT 8")
+    else:
+        cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
+            Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
+            User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId) AS LikesCount, \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s), \
+            (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
+            FROM Product, User WHERE Product.IsSold = 0 AND \
+            User.UserId = Product.UserId ORDER BY LikesCount DESC \
+            LIMIT 8", (str(g.user_id), ))
+    products_data = cur.fetchall()
+
+    resp_body["hot"] = []
+    for product_data in products_data:
+        resp_body["hot"].append({
+            "product_id": product_data[0],
+            "seller": {
+                "user_id": product_data[1],
+                "nickname": product_data[8],
+                "first_name": product_data[9],
+                "last_name": product_data[10],
+                "profile_pic": product_data[11],
+                "gender": product_data[12]
+            },
+            "name": product_data[2],
+            "category": product_data[3],
+            "description": product_data[4],
+            "price": product_data[5],
+            "location": product_data[6],
+            "photo": product_data[15],
+            "is_sold": product_data[7],
+            "likes": product_data[13],
+            "is_liked": product_data[14]
+        })
+
+    resp_body["following"] = []
+    if g.user_id is not None:
+        cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
+            Product.Category, Product.Description, Product.Price, Product.Location, Product.IsSold, \
+            User.Nickname, User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId) AS LikesCount, \
+            (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId AND Likes.UserId = %s), \
+            (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
+            FROM Product, User WHERE Product.IsSold = 0 AND \
+            Product.UserId IN (SELECT FollowingUserId FROM Follow WHERE FollowerUserId = %s) AND \
+            User.UserId = Product.UserId ORDER BY Product.CreateAt DESC \
+            LIMIT 8", (str(g.user_id), str(g.user_id), ))
+        products_data = cur.fetchall()
+
+        for product_data in products_data:
+            resp_body["following"].append({
+                "product_id": product_data[0],
+                "seller": {
+                    "user_id": product_data[1],
+                    "nickname": product_data[8],
+                    "first_name": product_data[9],
+                    "last_name": product_data[10],
+                    "profile_pic": product_data[11],
+                    "gender": product_data[12]
+                },
+                "name": product_data[2],
+                "category": product_data[3],
+                "description": product_data[4],
+                "price": product_data[5],
+                "location": product_data[6],
+                "photo": product_data[15],
+                "is_sold": product_data[7],
+                "likes": product_data[13],
+                "is_liked": product_data[14]
+            })
+
+    resp = make_response(json.dumps(resp_body), 200)
+    resp.headers["Content-Type"] = "application/json"
+    return resp
+
 def get_file_extension(filename):
     token = filename.split(".")
     return token[-1] if len(token) > 1 else None

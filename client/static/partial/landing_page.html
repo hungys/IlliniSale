@@ -1,3 +1,72 @@
+<style>
+    .name-truncate {
+        width: 240px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
 <div class="page-header">
-  <h2>Welcome to IlliniSale</h2>
+  <h2>Welcome to IlliniSale <small>The best trading platform for UIUC</small></h2>
+</div>
+
+<h3 ng-hide="landing_page_feeds.latest.length==0">See What's New</h3>
+
+<div class="row" ng-hide="landing_page_feeds.latest.length==0">
+    <div class="col-md-3" ng-repeat="product in landing_page_feeds.latest">
+        <div class="thumbnail">
+            <a href="#/product/{{product.product_id}}"><img src="/uploads/product/{{product.photo}}" class="img-responsive center-block" style="height: 240px;"><a/>
+                <div class="caption">
+                    <h3 class="name-truncate"><a href="#/product/{{product.product_id}}">{{product.name}}</a></h3>
+                    <p><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <a href="#/user/{{product.seller.user_id}}">{{product.seller.nickname}}</a></p>
+                    <p><span class="glyphicon glyphicon-usd" aria-hidden="true"></span> {{product.price}} <span class="label label-danger" ng-show="product.is_sold">Sold</span></p>
+                    <p>
+                        <button type="button" ng-click="like(product)" ng-class="{0: 'btn btn-default', 1: 'btn btn-danger'}[product.is_liked]" aria-label="Left Align">
+                            <span ng-class="{0: 'glyphicon glyphicon-heart-empty', 1: 'glyphicon glyphicon-heart'}[product.is_liked]" aria-hidden="true"></span>
+                        </button> {{product.likes}} user liked
+                    </p>
+                </div>
+        </div>
+    </div>
+</div>
+
+<h3 ng-hide="landing_page_feeds.hot.length==0">See What's Hot</h3>
+
+<div class="row" ng-hide="landing_page_feeds.hot.length==0">
+    <div class="col-md-3" ng-repeat="product in landing_page_feeds.hot">
+        <div class="thumbnail">
+            <a href="#/product/{{product.product_id}}"><img src="/uploads/product/{{product.photo}}" class="img-responsive center-block" style="height: 240px;"><a/>
+                <div class="caption">
+                    <h3 class="name-truncate"><a href="#/product/{{product.product_id}}">{{product.name}}</a></h3>
+                    <p><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <a href="#/user/{{product.seller.user_id}}">{{product.seller.nickname}}</a></p>
+                    <p><span class="glyphicon glyphicon-usd" aria-hidden="true"></span> {{product.price}} <span class="label label-danger" ng-show="product.is_sold">Sold</span></p>
+                    <p>
+                        <button type="button" ng-click="like(product)" ng-class="{0: 'btn btn-default', 1: 'btn btn-danger'}[product.is_liked]" aria-label="Left Align">
+                            <span ng-class="{0: 'glyphicon glyphicon-heart-empty', 1: 'glyphicon glyphicon-heart'}[product.is_liked]" aria-hidden="true"></span>
+                        </button> {{product.likes}} user liked
+                    </p>
+                </div>
+        </div>
+    </div>
+</div>
+
+<h3 ng-hide="landing_page_feeds.following.length==0">Following Sellers</h3>
+
+<div class="row" ng-hide="landing_page_feeds.following.length==0">
+    <div class="col-md-3" ng-repeat="product in landing_page_feeds.following">
+        <div class="thumbnail">
+            <a href="#/product/{{product.product_id}}"><img src="/uploads/product/{{product.photo}}" class="img-responsive center-block" style="height: 240px;"><a/>
+                <div class="caption">
+                    <h3 class="name-truncate"><a href="#/product/{{product.product_id}}">{{product.name}}</a></h3>
+                    <p><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <a href="#/user/{{product.seller.user_id}}">{{product.seller.nickname}}</a></p>
+                    <p><span class="glyphicon glyphicon-usd" aria-hidden="true"></span> {{product.price}} <span class="label label-danger" ng-show="product.is_sold">Sold</span></p>
+                    <p>
+                        <button type="button" ng-click="like(product)" ng-class="{0: 'btn btn-default', 1: 'btn btn-danger'}[product.is_liked]" aria-label="Left Align">
+                            <span ng-class="{0: 'glyphicon glyphicon-heart-empty', 1: 'glyphicon glyphicon-heart'}[product.is_liked]" aria-hidden="true"></span>
+                        </button> {{product.likes}} user liked
+                    </p>
+                </div>
+        </div>
+    </div>
 </div>

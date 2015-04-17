@@ -250,6 +250,22 @@ myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$localSt
 
 myapp.controller('LandingPageController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
     document.title = "IlliniSale";
+
+    $scope.like = function(product) {
+        $http.put(AppService.GetAPIServer() + '/api/product/' + product.product_id + "/like").success(function(response) {
+            if (!product.is_liked && response.liked) {
+                product.is_liked = 1;
+                product.likes = product.likes + 1;
+            } else if (product.is_liked && !response.liked) {
+                product.is_liked = 0;
+                product.likes = product.likes - 1;
+            }
+        });
+    };
+
+    $http.get(AppService.GetAPIServer() + '/api/product/landing').success(function(response) {
+        $scope.landing_page_feeds = response;
+    });
 }]);
 
 myapp.controller('UserLoginController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
