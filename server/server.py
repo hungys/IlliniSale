@@ -85,4 +85,5 @@ def not_found(error):
 if __name__ == '__main__':
     http_server = HTTPServer(WSGIContainer(app))
     http_server.listen(5000)
+    print "Flask app starting"
     IOLoop.instance().start()
