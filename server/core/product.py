@@ -41,7 +41,9 @@ def get_products(category):
 
     cur.execute("SELECT COUNT(Product.ProductId) FROM Product WHERE Product.Category \
         = %s", (category, ))
-    total_pages = cur.fetchone()[0] / rows_per_page + 1
+
+    total_entries = cur.fetchone()[0]
+    total_pages = total_entries / rows_per_page if total_entries % rows_per_page == 0 else total_entries / rows_per_page + 1
 
     resp_body = {}
     resp_body["total_pages"] = total_pages
@@ -192,7 +194,8 @@ def search_product():
         cur.execute("SELECT COUNT(Product.ProductId) FROM Product \
             WHERE LOWER(Product.Name) LIKE %s AND Product.Category = %s \
             AND Product.Price >= %s AND Product.Price <= %s", (keyword_pattern, category_arg, str(price_low_arg), str(price_high_arg)))
-        total_pages = cur.fetchone()[0] / rows_per_page + 1
+        total_entries = cur.fetchone()[0]
+        total_pages = total_entries / rows_per_page if total_entries % rows_per_page == 0 else total_entries / rows_per_page + 1
     else:
         if g.user_id is None:
             cur.execute("SELECT Product.ProductId, Product.UserId, Product.Name, \
@@ -220,7 +223,8 @@ def search_product():
         cur.execute("SELECT COUNT(Product.ProductId) FROM Product \
             WHERE LOWER(Product.Name) LIKE %s \
             AND Product.Price >= %s AND Product.Price <= %s", (keyword_pattern, str(price_low_arg), str(price_high_arg)))
-        total_pages = cur.fetchone()[0] / rows_per_page + 1
+        total_entries = cur.fetchone()[0]
+        total_pages = total_entries / rows_per_page if total_entries % rows_per_page == 0 else total_entries / rows_per_page + 1
 
     resp_body = {}
     resp_body["total_pages"] = total_pages
