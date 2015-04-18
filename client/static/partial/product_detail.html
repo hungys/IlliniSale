@@ -120,7 +120,7 @@
                                 <button type="button" class="btn btn-default btn-xs pull-right" aria-label="Left Align" data-toggle="modal" data-target="#modal_respond" ng-show="product.is_owner" ng-click="respond(comment)">
                                     <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
                                 </button>
-                                <p><img src="http://placehold.it/40x40" class="img-circle"><strong> {{comment.user_nickname}}</strong></p>
+                                <p><img ng-src="/uploads/user/{{comment.user_profile_pic}}" class="img-circle" style="width: 40px; height: 40px"><strong> {{comment.user_nickname}}</strong></p>
                                 <p>{{comment.content}}</p>
                                 <p class="comment-response" ng-show="comment.is_responded"><strong>Seller:</strong> {{comment.response}}</p>
                                 <hr>
