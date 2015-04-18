@@ -277,7 +277,7 @@ def post_product():
     req_body = json.loads(request.data)
     cur = g.db.cursor()
     cur.execute("INSERT INTO Product(UserId, Name, Category, Description, \
-        Price, Location) VALUES(%s, %s, %s, %s, %s, %s)", (str(g.user_id), 
+        Price, Location, IsSold) VALUES(%s, %s, %s, %s, %s, %s, 0)", (str(g.user_id), 
         req_body["name"], req_body["category"], req_body["description"], 
         str(req_body["price"]), req_body["location"]))
 
