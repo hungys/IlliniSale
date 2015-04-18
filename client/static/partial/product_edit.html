@@ -39,7 +39,7 @@
                 <p ng-hide="product.photos.length">No any photo now</p>
                 <div class="row">
                     <div class="col-md-4" ng-repeat="photo in product.photos">
-                        <img src="/uploads/product/{{photo.filename}}" style="height: 150px; width: 150px;"/>
+                        <img ng-src="/uploads/product/{{photo.filename}}" style="height: 150px; width: 150px;"/>
                         <button type="button" class="btn btn-default" ng-click="delete_photo(photo)" aria-label="Remove">
                           <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
                         </button>

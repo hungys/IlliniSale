@@ -16,7 +16,7 @@
 <div class="row" ng-hide="landing_page_feeds.latest.length==0">
     <div class="col-md-3" ng-repeat="product in landing_page_feeds.latest">
         <div class="thumbnail">
-            <a href="#/product/{{product.product_id}}"><img src="/uploads/product/{{product.photo}}" class="img-responsive center-block" style="height: 240px;"><a/>
+            <a href="#/product/{{product.product_id}}"><img ng-src="/uploads/product/{{product.photo}}" class="img-responsive center-block" style="height: 240px;"><a/>
                 <div class="caption">
                     <h3 class="name-truncate"><a href="#/product/{{product.product_id}}">{{product.name}}</a></h3>
                     <p><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <a href="#/user/{{product.seller.user_id}}">{{product.seller.nickname}}</a></p>
@@ -36,7 +36,7 @@
 <div class="row" ng-hide="landing_page_feeds.hot.length==0">
     <div class="col-md-3" ng-repeat="product in landing_page_feeds.hot">
         <div class="thumbnail">
-            <a href="#/product/{{product.product_id}}"><img src="/uploads/product/{{product.photo}}" class="img-responsive center-block" style="height: 240px;"><a/>
+            <a href="#/product/{{product.product_id}}"><img ng-src="/uploads/product/{{product.photo}}" class="img-responsive center-block" style="height: 240px;"><a/>
                 <div class="caption">
                     <h3 class="name-truncate"><a href="#/product/{{product.product_id}}">{{product.name}}</a></h3>
                     <p><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <a href="#/user/{{product.seller.user_id}}">{{product.seller.nickname}}</a></p>
@@ -56,7 +56,7 @@
 <div class="row" ng-hide="landing_page_feeds.following.length==0">
     <div class="col-md-3" ng-repeat="product in landing_page_feeds.following">
         <div class="thumbnail">
-            <a href="#/product/{{product.product_id}}"><img src="/uploads/product/{{product.photo}}" class="img-responsive center-block" style="height: 240px;"><a/>
+            <a href="#/product/{{product.product_id}}"><img ng-src="/uploads/product/{{product.photo}}" class="img-responsive center-block" style="height: 240px;"><a/>
                 <div class="caption">
                     <h3 class="name-truncate"><a href="#/product/{{product.product_id}}">{{product.name}}</a></h3>
                     <p><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <a href="#/user/{{product.seller.user_id}}">{{product.seller.nickname}}</a></p>

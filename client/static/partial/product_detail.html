@@ -25,7 +25,7 @@
 
                   <div class="carousel-inner" role="listbox">
                     <div class="item" ng-class="{active:!$index}" ng-repeat="photo in product.photos">
-                      <img src="/uploads/product/{{photo.filename}}" style="max-height: 500px;" class="img-responsive center-block">
+                      <img ng-src="/uploads/product/{{photo.filename}}" style="max-height: 500px;" class="img-responsive center-block">
                     </div>
                   </div>
 

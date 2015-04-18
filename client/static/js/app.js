@@ -916,7 +916,6 @@ myapp.controller('UserProfileController', ['$scope', '$rootScope', '$localStorag
 
     $http.get(AppService.GetAPIServer() + '/api/user/' + $scope.userId + "/review").success(function(response) {
         $scope.reviews_list = response
-        $("#user_rating").value("3");
     });
 }]);
 
