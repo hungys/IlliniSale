@@ -98,6 +98,6 @@ class AutoCompleteProvider:
 
     def autocomplete(self, keyword):
         result = []
-        self.root_node.search(keyword, '', result)
+        self.root_node.search(keyword.lower(), '', result)
         result.sort()
         return result[0:10]
