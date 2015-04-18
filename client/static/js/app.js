@@ -304,6 +304,8 @@ myapp.controller('UserLoginController', ['$scope', '$http', '$location', '$route
 }]);
 
 myapp.controller('UserRegisterController', ['$scope', '$rootScope', '$http', '$localStorage', '$location', '$route', 'AuthService', 'AppService', 'FileUploader', function($scope, $rootScope, $http, $localStorage, $location, $route, AuthService, AppService, FileUploader) {
+    document.title = "Register - IlliniSale";
+
     if (AuthService.IsLoggedIn()) {
         $location.path('/');
     }
@@ -381,8 +383,10 @@ myapp.controller('UserRegisterController', ['$scope', '$rootScope', '$http', '$l
 }]);
 
 myapp.controller('UserSettingsController', ['$scope', '$rootScope', '$http', '$localStorage', '$location', '$route', 'AuthService', 'AppService', 'FileUploader', function($scope, $rootScope, $http, $localStorage, $location, $route, AuthService, AppService, FileUploader) {
+    document.title = "Settings - IlliniSale";
+
     if (!AuthService.IsLoggedIn()) {
-        $location.path('/');
+        $location.path('/user/login').search('redirect', '/settings');
     }
 
     $scope.submit = function() {
@@ -455,6 +459,8 @@ myapp.controller('ProductCategoryController', ['$scope', '$http', '$location', '
     } else {
         $scope.currentPage = 1
     }
+
+    document.title = $scope.categoryName + " - IlliniSale";
 
     $scope.like = function(product) {
         $http.put(AppService.GetAPIServer() + '/api/product/' + product.product_id + "/like").success(function(response) {
@@ -597,7 +603,7 @@ myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$
     $http.get(AppService.GetAPIServer() + '/api/product/' + $scope.productId).success(function(response) {
         $scope.product = response
         $scope.product.comment_count = $scope.product.comments.length;
-        $scope.product.is_owner = $scope.product.seller.user_id == $rootScope.current_user.user_id;
+        $scope.product.is_owner = $scope.isLoggedIn && $scope.product.seller.user_id == $rootScope.current_user.user_id;
         $scope.product.tag_empty = $scope.product.tags.length == 0
 
         for (var i = 0; i < $scope.product.comments.length; i++) {
@@ -607,10 +613,14 @@ myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$
                 $scope.product.comments[i].is_responded = false;
             }
         }
+
+        document.title = $scope.product.name + " - IlliniSale";
     });
 }]);
 
 myapp.controller('ProductSellController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', 'FileUploader', function($scope, $rootScope, $http, $location, $route, AuthService, AppService, FileUploader) {
+    document.title = "Sell - IlliniSale";
+
     if (!AuthService.IsLoggedIn()) {
         $location.path('/user/login').search('redirect', '/product/sell');
     }
@@ -748,9 +758,11 @@ myapp.controller('ProductQueryController', ['$scope', '$rootScope', '$http', '$l
     if ($location.search().keyword != null) {
         $scope.criteria_keyword = $location.search().keyword
         $scope.keyword = $location.search().keyword
+        document.title = "Search for " + $scope.keyword + " - IlliniSale";
     } else {
         $scope.criteria_keyword = ""
         $scope.keyword = ""
+        document.title = "Search - IlliniSale";
     }
 
     if ($location.search().category != null) {
@@ -887,6 +899,7 @@ myapp.controller('UserProfileController', ['$scope', '$rootScope', '$localStorag
 
     $http.get(AppService.GetAPIServer() + '/api/user/' + $scope.userId + "/profile").success(function(response) {
         $scope.user = response
+        document.title = $scope.user.nickname + "'s Profile - IlliniSale";
     });
 
     $http.get(AppService.GetAPIServer() + '/api/user/' + $scope.userId + "/product").success(function(response) {
@@ -908,6 +921,8 @@ myapp.controller('UserProfileController', ['$scope', '$rootScope', '$localStorag
 }]);
 
 myapp.controller('WantlistController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $location, $route, AuthService, AppService) {
+    document.title = "My Wantlist - IlliniSale";
+
     $scope.insert = function() {
         $http.post(AppService.GetAPIServer() + '/api/wantlist', {
                 name: $("#new_wantlist").val()
@@ -959,6 +974,12 @@ myapp.controller('WantlistController', ['$scope', '$rootScope', '$http', '$locat
 }]);
 
 myapp.controller('MyBidsController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $location, $route, AuthService, AppService) {
+    document.title = "My Bids - IlliniSale";
+
+    if (!AuthService.IsLoggedIn()) {
+        $location.path('/user/login').search('redirect', '/mybids');
+    }
+
     $scope.accept = function(bid) {
         if (bid.is_new) {
             $http.put(AppService.GetAPIServer() + '/api/bid/' + bid.bid_id, {
