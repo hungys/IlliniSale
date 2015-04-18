@@ -32,7 +32,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-4 text-center" ng-hide="is_me">
+                    <div class="col-md-4 text-center" ng-hide="!isLoggedIn || is_me">
                         <br/>
                         <button ng-hide="user.is_followed" type="button" class="btn btn-default" ng-click="follow(user)">Follow</button>
                         <button ng-show="user.is_followed" type="button" class="btn btn-primary" ng-click="follow(user)">Unfollow</button>
@@ -77,9 +77,9 @@
                                     <h3 class="name-truncate"><a href="#/product/{{product.product_id}}">{{product.name}}</a></h3>
                                     <p><span class="glyphicon glyphicon-usd" aria-hidden="true"></span> {{product.price}} <span class="label label-danger" ng-show="product.is_sold">Sold</span></p>
                                     <p>
-                                        <button type="button" ng-click="like(product)" ng-class="{0: 'btn btn-default', 1: 'btn btn-danger'}[product.is_liked]" aria-label="Left Align">
+                                        <button type="button" ng-show="isLoggedIn" ng-click="like(product)" ng-class="{0: 'btn btn-default', 1: 'btn btn-danger'}[product.is_liked]" aria-label="Left Align">
                                             <span ng-class="{0: 'glyphicon glyphicon-heart-empty', 1: 'glyphicon glyphicon-heart'}[product.is_liked]" aria-hidden="true"></span>
-                                        </button> {{product.likes}} user liked
+                                        </button><span class="glyphicon glyphicon-heart" ng-hide="isLoggedIn" aria-hidden="true"></span> {{product.likes}} user liked
                                     </p>
                                 </div>
                         </div>
@@ -93,7 +93,7 @@
                                 <div class="caption text-center">
                                     <strong><a href="#/user/{{follower.user_id}}">{{follower.nickname}}</a></strong>
                                     <p>{{follower.product_count}} products · {{follower.follower_count}} followers</p>
-                                    <p><button ng-hide="follower.is_followed" type="button" class="btn btn-default btn-block" ng-click="follow(follower)">Follow</button><button ng-show="follower.is_followed" type="button" class="btn btn-primary btn-block" ng-click="follow(follower)">Unfollow</button></p>
+                                    <p><button ng-hide="!isLoggedIn || follower.is_followed" type="button" class="btn btn-default btn-block" ng-click="follow(follower)">Follow</button><button ng-show="isLoggedIn && follower.is_followed" type="button" class="btn btn-primary btn-block" ng-click="follow(follower)">Unfollow</button></p>
                                 </div>
                         </div>
                     </div>
@@ -106,7 +106,7 @@
                                 <div class="caption text-center">
                                     <strong><a href="#/user/{{following.user_id}}">{{following.nickname}}</a></strong>
                                     <p>{{following.product_count}} products · {{following.follower_count}} followers</p>
-                                    <p><button ng-hide="following.is_followed" type="button" class="btn btn-default btn-block" ng-click="follow(following)">Follow</button><button ng-show="following.is_followed" type="button" class="btn btn-primary btn-block" ng-click="follow(following)">Unfollow</button></p>
+                                    <p><button ng-hide="!isLoggedIn || following.is_followed" type="button" class="btn btn-default btn-block" ng-click="follow(following)">Follow</button><button ng-show="isLoggedIn && following.is_followed" type="button" class="btn btn-primary btn-block" ng-click="follow(following)">Unfollow</button></p>
                                 </div>
                         </div>
                     </div>

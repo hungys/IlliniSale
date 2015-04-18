@@ -505,6 +505,7 @@ myapp.controller('ProductCategoryController', ['$scope', '$http', '$location', '
 }]);
 
 myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $location, $route, AuthService, AppService) {
+    $scope.isLoggedIn = AuthService.IsLoggedIn();
     $scope.productId = $route.current.params.product_id;
 
     $scope.like = function() {
@@ -586,7 +587,12 @@ myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$
             }).error(function(data, status, headers, config) {
                 alertify.error("Fail to submit, try again later!");
             });
-    }
+    };
+
+    $scope.login = function() {
+        var redirect_url = $location.url()
+        $location.path('/user/login').search('redirect', redirect_url);
+    };
 
     $http.get(AppService.GetAPIServer() + '/api/product/' + $scope.productId).success(function(response) {
         $scope.product = response
@@ -605,6 +611,10 @@ myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$
 }]);
 
 myapp.controller('ProductSellController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', 'FileUploader', function($scope, $rootScope, $http, $location, $route, AuthService, AppService, FileUploader) {
+    if (!AuthService.IsLoggedIn()) {
+        $location.path('/user/login').search('redirect', '/product/sell');
+    }
+
     $scope.submit = function() {
         $http.post(AppService.GetAPIServer() + '/api/product' , {
                 name: $("#name").val(),
@@ -848,6 +858,7 @@ myapp.controller('ProductQueryController', ['$scope', '$rootScope', '$http', '$l
 }]);
 
 myapp.controller('UserProfileController', ['$scope', '$rootScope', '$localStorage', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $localStorage, $http, $location, $route, AuthService, AppService) {
+    $scope.isLoggedIn = AuthService.IsLoggedIn();
     $scope.userId = $route.current.params.user_id;
 
     $scope.like = function(product) {

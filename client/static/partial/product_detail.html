@@ -60,13 +60,14 @@
                 <p><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> ${{product.price}}</p>
                 <p><span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span> {{product.location}}</p>
                 <p>
-                    <button type="button" ng-hide="product.is_owner || product.is_sold" class="btn btn-primary" data-toggle="modal" data-target="#modal_bid" ng-hide="product.is_sold==1">Bid to buy</button>
+                    <button type="button" ng-hide="!isLoggedIn || product.is_owner || product.is_sold" class="btn btn-primary" data-toggle="modal" data-target="#modal_bid">Bid to buy</button>
+                    <button type="button" ng-hide="isLoggedIn" ng-click="login()" class="btn btn-primary">Login to bid</button>
                 </p>
                 <p>
-                    <button type="button" ng-class="{1: 'btn btn-danger', 0: 'btn btn-default'}[product.is_liked]" ng-click="like()" ng-hide="product.is_liked">Like this ({{product.likes}})</button>
+                    <button type="button" ng-class="{1: 'btn btn-danger', 0: 'btn btn-default'}[product.is_liked]" ng-click="like()" ng-hide="!isLoggedIn || product.is_liked">Like this ({{product.likes}})</button>
                 </p>
                 <p>
-                    <button type="button" ng-class="{1: 'btn btn-danger', 0: 'btn btn-default'}[product.is_liked]" ng-click="like()" ng-show="product.is_liked">Unlike this ({{product.likes}})</button>
+                    <button type="button" ng-class="{1: 'btn btn-danger', 0: 'btn btn-default'}[product.is_liked]" ng-click="like()" ng-show="isLoggedIn && product.is_liked">Unlike this ({{product.likes}})</button>
                 </p>
             </div>
         </div>
@@ -128,7 +129,8 @@
                                 <div class="form-group">
                                     <textarea maxlength="500" class="form-control" rows="3" id="new_comment" placeholder="Write a public comment..." required></textarea>
                                 </div>
-                                <button type="submit" class="btn btn-default">Submit</button>
+                                <button type="submit" class="btn btn-default" ng-show="isLoggedIn">Submit</button>
+                                <button class="btn btn-default" ng-click="login()" ng-hide="isLoggedIn">Login to post</button>
                             </form>
                             <div class="modal fade" id="modal_respond" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
