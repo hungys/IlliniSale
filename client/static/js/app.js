@@ -755,6 +755,8 @@ myapp.controller('ProductEditController', ['$scope', '$rootScope', '$http', '$lo
 }]);
 
 myapp.controller('ProductQueryController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $location, $route, AuthService, AppService) {
+    $scope.isLoggedIn = AuthService.IsLoggedIn();
+
     if ($location.search().keyword != null) {
         $scope.criteria_keyword = $location.search().keyword
         $scope.keyword = $location.search().keyword
