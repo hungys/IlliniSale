@@ -90,7 +90,8 @@ class AutoCompleteProvider:
         for candidate in candidates:
             self.insert(candidate[0])
             for token in candidate[0].split(" "):
-                self.insert(token)
+                if len(token) > 0:
+                    self.insert(token)
 
         print "AutoCompleteProvider loaded"
 
