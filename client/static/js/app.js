@@ -228,6 +228,11 @@ myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$localSt
         });
     };
 
+    $scope.login = function() {
+        var redirect_url = $location.url()
+        $location.path('/user/login').search('redirect', redirect_url);
+    };
+
     $scope.logout = function() {
         AuthService.Logout(function() {
             $route.reload();
@@ -251,6 +256,8 @@ myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$localSt
 myapp.controller('LandingPageController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
     document.title = "IlliniSale";
 
+    $scope.isLoggedIn = AuthService.IsLoggedIn();
+
     $scope.like = function(product) {
         $http.put(AppService.GetAPIServer() + '/api/product/' + product.product_id + "/like").success(function(response) {
             if (!product.is_liked && response.liked) {
@@ -271,6 +278,12 @@ myapp.controller('LandingPageController', ['$scope', '$http', '$location', '$rou
 myapp.controller('UserLoginController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
     document.title = "Login - IlliniSale";
 
+    var redirect_url = "/";
+
+    if ($route.current.params.redirect != null) {
+        redirect_url = $route.current.params.redirect;
+    }
+
     $scope.login = function() {
         if ($("#email").val() === "" || $("#password").val() === "") {
             alertify.error("Email and password cannot be empty!");
@@ -279,7 +292,7 @@ myapp.controller('UserLoginController', ['$scope', '$http', '$location', '$route
                 function(response) {
                     alertify.success("You are now logged in!");
                     $route.reload();
-                    $location.path('/');
+                    $location.url(redirect_url);
                 }, 
                 function() {
                     AuthService.ClearToken();
@@ -433,6 +446,8 @@ myapp.controller('UserSettingsController', ['$scope', '$rootScope', '$http', '$l
 }]);
 
 myapp.controller('ProductCategoryController', ['$scope', '$http', '$location', '$route', 'AuthService', 'AppService', function($scope, $http, $location, $route, AuthService, AppService) {
+    $scope.isLoggedIn = AuthService.IsLoggedIn();
+
     $scope.categoryId = $route.current.params.category;
     $scope.categoryName = AppService.GetCategoryName($scope.categoryId);
     if ($route.current.params.pageno != null) {
