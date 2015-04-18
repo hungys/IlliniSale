@@ -14,6 +14,13 @@
 <br/>
 <br/>
 
+<div class="row" ng-show="product.new_bid_alert">
+    <div class="alert alert-warning alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <strong>Good news!</strong> Someone bidded your product, check <a href="#/mybids" class="alert-link">My Bids</a>.
+    </div>
+</div>
+
 <div class="row">
     <div class="col-md-7">
         <div class="panel panel-default">
@@ -39,19 +46,17 @@
                     <span class="sr-only">Next</span>
                   </a>
                 </div>
-                <!-- <img src="/uploads/product/{{product.photos[0].filename}}" style="max-width: 500px;"> -->
             </div>
         </div>
     </div>
     <div class="col-md-5">
         <div class="panel panel-default">
             <div class="panel-body">
-                <h3><div class="dropdown">{{product.name}} <span class="label label-danger" ng-show="product.is_sold">Sold out</span> <button type="button" class="btn btn-default dropdown-toggle" id="btn_manage" data-toggle="dropdown" aria-expanded="true" ng-show="product.is_owner">
+                <h3><div class="dropdown">{{product.name}} <span class="label label-danger" ng-show="product.is_sold">Sold</span> <button type="button" class="btn btn-default dropdown-toggle" id="btn_manage" data-toggle="dropdown" aria-expanded="true" ng-show="product.is_owner">
   <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
 </button><ul class="dropdown-menu" role="menu" aria-labelledby="btn_manage">
     <li role="presentation"><a role="menuitem" tabindex="-1" href="#/product/{{product.product_id}}/edit">Edit</a></li>
     <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="toggle_sold()">{{product.is_sold ? 'Mark as unsold' : 'Mark as sold'}}</a></li>
-    <!-- <li role="presentation"><a role="menuitem" tabindex="-1" href="">Delete</a></li> -->
   </ul></div></h3>
                 <p><span class="glyphicon glyphicon-user" aria-hidden="true"></span> <a href="#/user/{{product.seller.user_id}}">{{product.seller.nickname}}</a></p>
                 <p ng-hide="product.tag_empty"><span class="glyphicon glyphicon-tags" aria-hidden="true"></span> 

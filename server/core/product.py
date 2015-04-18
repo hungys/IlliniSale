@@ -120,6 +120,12 @@ def get_product(product_id):
         cur.execute("SELECT UserId FROM Likes WHERE ProductId = %s AND UserId = %s", (str(product_id), str(g.user_id)))
         is_liked = 0 if cur.fetchone() is None else 1
 
+    if g.user_id is None or product_data[0] != g.user_id:
+        new_bid_alert = 0
+    else:
+        cur.execute("SELECT BidId FROM Bid WHERE ProductId = %s AND Status = 'New'", (str(product_id),))
+        new_bid_alert = 0 if cur.fetchone() is None else 1
+
     if product_data is None:
         abort(404)
     
@@ -144,7 +150,8 @@ def get_product(product_id):
         "is_sold": product_data[6],
         "post_time": product_data[7],
         "likes": product_data[13],
-        "is_liked": is_liked
+        "is_liked": is_liked,
+        "new_bid_alert": new_bid_alert
     }
 
     resp = make_response(json.dumps(resp_body), 200)

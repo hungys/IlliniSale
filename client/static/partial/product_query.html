@@ -56,7 +56,11 @@
             </div>
         </div>
 
-        <div class="text-center">
+        <div class="alert alert-warning" role="alert" ng-hide="totalPages>0">
+            No search result.
+        </div>
+
+        <div class="text-center" ng-show="totalPages>0">
             <nav>
                 <ul class="pagination align-center">
                     <li ng-class="{false: '', true: 'disabled'}[isFirstPage]">
