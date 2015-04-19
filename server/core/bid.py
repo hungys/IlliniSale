@@ -12,7 +12,7 @@ def get_my_bids():
     cur.execute("SELECT Bid.BidId, Bid.ProductId, Bid.Price, Bid.Status, \
         unix_timestamp(Bid.CreateAt), Product.Name, Product.Price, Product.UserId, \
         User.Nickname, (SELECT COUNT(*) FROM Review WHERE Review.BidId = Bid.BidId) FROM Bid, Product, User WHERE Bid.ProductId = Product.ProductId \
-        AND Bid.UserId = %s AND User.UserId = Bid.UserId", (str(g.user_id),))
+        AND Bid.UserId = %s AND User.UserId = Product.UserId", (str(g.user_id),))
     bids_data = cur.fetchall()
 
     my_bids = []

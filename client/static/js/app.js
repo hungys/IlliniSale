@@ -210,7 +210,11 @@ myapp.directive('ngThumb', ['$window', function($window) {
 myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$localStorage', '$location', '$route', 'AuthService', 'AppService', function($scope, $rootScope, $http, $localStorage, $location, $route, AuthService, AppService) {
     $rootScope.$on("auth_changed", function() {
         $scope.isLoggedIn = AuthService.IsLoggedIn();
-        $scope.get_current_user();
+        if ($scope.isLoggedIn) {
+            $scope.get_current_user();
+            $scope.get_notifications();
+            $scope.set_notificaton_timer();
+        }
     });
 
     $scope.$on('$routeChangeSuccess', function () {
@@ -1004,6 +1008,18 @@ myapp.controller('MyBidsController', ['$scope', '$rootScope', '$http', '$locatio
         $location.path('/user/login').search('redirect', '/mybids');
     }
 
+    $scope.action_pending = false;
+
+    if ($route.current.params.bid_id != null) {
+        $scope.action_pending = true;
+        $scope.action_type = "highlight";
+        $scope.action_bid_id = $route.current.params.bid_id;
+    } else if ($route.current.params.user_id != null) {
+        $scope.action_pending = true;
+        $scope.action_type = "message";
+        $scope.action_user_id = $route.current.params.user_id;
+    }
+
     $scope.accept = function(bid) {
         if (bid.is_new) {
             $http.put(AppService.GetAPIServer() + '/api/bid/' + bid.bid_id, {
@@ -1044,7 +1060,7 @@ myapp.controller('MyBidsController', ['$scope', '$rootScope', '$http', '$locatio
         }
     };
 
-    $scope.contact = function(bid, user_id, nickname) {
+    $scope.contact = function(user_id, nickname) {
         $scope.current_conversation = {
             "user_id": user_id,
             "nickname": nickname
@@ -1119,6 +1135,23 @@ myapp.controller('MyBidsController', ['$scope', '$rootScope', '$http', '$locatio
                     $scope.bids_list.sells[i].status_display = "Rejected";
                     break;
             }
+
+            if ($scope.action_pending &&
+                $scope.action_type == "highlight" &&
+                $scope.bids_list.sells[i].bid_id == $scope.action_bid_id) {
+                $scope.bids_list.sells[i].highlight = true;
+                $scope.action_pending = false;
+            } else {
+                $scope.bids_list.sells[i].highlight = false;
+            }
+
+            if ($scope.action_pending && 
+                $scope.action_type == "message" &&
+                $scope.bids_list.sells[i].bidder.user_id == $scope.action_user_id) {
+                $scope.contact($scope.bids_list.sells[i].bidder.user_id, $scope.bids_list.sells[i].bidder.nickname);
+                $("#modal_message").modal("show");
+                $scope.action_pending = false;
+            }
         }
 
         for (var i = 0; i < $scope.bids_list.bids.length; i++) {
@@ -1135,6 +1168,23 @@ myapp.controller('MyBidsController', ['$scope', '$rootScope', '$http', '$locatio
                 case "rejected":
                     $scope.bids_list.bids[i].status_display = "Rejected";
                     break;
+            }
+
+            if ($scope.action_pending && 
+                $scope.action_type == "highlight" &&
+                $scope.bids_list.bids[i].bid_id == $scope.action_bid_id) {
+                $scope.bids_list.bids[i].highlight = true;
+                $scope.action_pending = false;
+            } else {
+                $scope.bids_list.bids[i].highlight = false;
+            }
+
+            if ($scope.action_pending && 
+                $scope.action_type == "message" &&
+                $scope.bids_list.bids[i].product.seller_user_id == $scope.action_user_id) {
+                $scope.contact($scope.bids_list.bids[i].product.seller_user_id, $scope.bids_list.bids[i].product.seller_nickname);
+                $("#modal_message").modal("show");
+                $scope.action_pending = false;
             }
         }
     });

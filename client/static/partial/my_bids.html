@@ -17,7 +17,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="bid in bids_list.sells">
+        <tr ng-repeat="bid in bids_list.sells" ng-class="{true: 'warning', false:''}[bid.highlight]">
             <td>{{bid.timestamp * 1000 | date:'MM/dd/yyyy HH:mm'}}</td>
             <td><a href="#/product/{{bid.product.id}}">{{bid.product.name}}</a></td>
             <td><a href="#/user/{{bid.bidder.user_id}}">{{bid.bidder.nickname}}</a></td>
@@ -31,7 +31,7 @@
                 <button type="button" ng-show="bid.is_new" ng-click="reject(bid)" class="btn btn-danger" aria-label="Left Align">
                     <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Reject
                 </button>
-                <button type="button" ng-click="contact(bid, bid.bidder.user_id, bid.bidder.nickname)" class="btn btn-default" aria-label="Left Align" data-toggle="modal" data-target="#modal_message">
+                <button type="button" ng-click="contact(bid.bidder.user_id, bid.bidder.nickname)" class="btn btn-default" aria-label="Left Align" data-toggle="modal" data-target="#modal_message">
                     <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Contact
                 </button>
             </td>
@@ -53,7 +53,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="bid in bids_list.bids">
+        <tr ng-repeat="bid in bids_list.bids" ng-class="{true: 'warning', false:''}[bid.highlight]">
             <td>{{bid.timestamp * 1000 | date:'MM/dd/yyyy HH:mm'}}</td>
             <td><a href="#/product/{{bid.product.id}}">{{bid.product.name}}</a></td>
             <td>${{bid.product.price}}</td>
@@ -66,7 +66,7 @@
                 <button type="button" ng-show="bid.is_accepted && !bid.is_reviewed" ng-click="review(bid)" class="btn btn-default" aria-label="Left Align" data-toggle="modal" data-target="#modal_review">
                     <span class="glyphicon glyphicon-star" aria-hidden="true"></span> Review
                 </button>
-                <button type="button" ng-click="contact(bid, bid.product.seller_user_id, bid.product.seller_nickname)" class="btn btn-default" aria-label="Left Align" data-toggle="modal" data-target="#modal_message">
+                <button type="button" ng-click="contact(bid.product.seller_user_id, bid.product.seller_nickname)" class="btn btn-default" aria-label="Left Align" data-toggle="modal" data-target="#modal_message">
                     <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Contact
                 </button>
             </td>

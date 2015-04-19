@@ -66,7 +66,7 @@ def send_message_notification(from_user_id, to_user_id, content):
 
     from_nickname = cur.fetchone()[0]
     body = "%s sent message to you: \"%s...\"" % (from_nickname, content[:15])
-    url = "/mybids"
+    url = "/mybids?user_id=%d" % from_user_id
 
     send_notification(to_user_id, body, url)
 
@@ -81,7 +81,7 @@ def send_bid_response_notification(seller_user_id, bidder_user_id, bid_id, actio
     product_name = cur.fetchone()[0]
 
     body = "%s %s your bid for %s" % (seller_nickname, action, product_name)
-    url = "/mybids"
+    url = "/mybids?bid_id=%d" % bid_id
 
     send_notification(bidder_user_id, body, url)
 
@@ -98,6 +98,6 @@ def send_bid_request_notification(bidder_user_id, bid_id):
     seller_user_id = product_data[1]
 
     body = "%s placed a bid for %s" % (bidder_nickname, product_name)
-    url = "/mybids"
+    url = "/mybids?bid_id=%d" % bid_id
 
     send_notification(seller_user_id, body, url)
