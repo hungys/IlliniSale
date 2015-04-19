@@ -1,6 +1,7 @@
 from flask import Blueprint, g, make_response, abort, request, current_app
 from werkzeug import secure_filename
 from core.permission import auth
+from core.notification import send_bid_request_notification
 import json
 import os
 import uuid
@@ -344,6 +345,8 @@ def bid_product(product_id):
     g.db.commit()
 
     resp_body = {"bid_id": cur.lastrowid}
+
+    send_bid_request_notification(g.user_id, cur.lastrowid)
 
     resp = make_response(json.dumps(resp_body), 200)
     resp.headers["Content-Type"] = "application/json"

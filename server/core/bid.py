@@ -1,5 +1,6 @@
 from flask import Blueprint, g, make_response, abort, request
 from core.permission import auth
+from core.notification import send_bid_response_notification
 import json
 
 bid = Blueprint("bid", __name__)
@@ -69,20 +70,22 @@ def get_my_bids():
 def respond_bid_request(bid_id):
     req_body = json.loads(request.data)
     cur = g.db.cursor()
-    cur.execute("SELECT Bid.BidId, Bid.Status, Product.UserId FROM Bid, Product \
+    cur.execute("SELECT Bid.BidId, Bid.Status, Bid.UserId, Product.UserId FROM Bid, Product \
         WHERE Bid.BidId = %s AND Bid.ProductId = Product.ProductId", (str(bid_id),))
     bid_data = cur.fetchone()
 
     if bid_data is None:
         abort(404)
 
-    if bid_data[2] != g.user_id:
+    if bid_data[3] != g.user_id:
         abort(403)
 
     new_status = "accepted" if req_body["accept"] == 1 else "rejected"
 
     cur.execute("UPDATE Bid SET Status = %s WHERE BidId = %s", (new_status, 
         str(bid_id)))
+
+    send_bid_response_notification(bid_data[3], bid_data[2], bid_data[0], new_status)
 
     g.db.commit()
 

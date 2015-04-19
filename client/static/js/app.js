@@ -228,6 +228,25 @@ myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$localSt
         });
     };
 
+    $scope.get_notifications = function() {
+        $http.get(AppService.GetAPIServer() + '/api/notification/latest').success(function(response) {
+            $scope.notification_list = response
+        });
+    };
+
+    $scope.set_notificaton_timer = function() {
+        if ($scope.notification_timer == null) {
+            $scope.notification_timer = setInterval(function() {$scope.get_notifications()}, 30000);
+        }
+    };
+
+    $scope.clear_notificaton_timer = function() {
+        if ($scope.notification_timer != null) {
+            clearInterval($scope.notification_timer);
+            $scope.notification_timer = null;
+        }
+    };
+
     $scope.login = function() {
         var redirect_url = $location.url()
         $location.path('/user/login').search('redirect', redirect_url);
@@ -235,6 +254,7 @@ myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$localSt
 
     $scope.logout = function() {
         AuthService.Logout(function() {
+            $scope.clear_notificaton_timer();
             $route.reload();
             $location.path('/');
         });
@@ -245,11 +265,14 @@ myapp.controller('NavbarController', ['$scope', '$rootScope', '$http', '$localSt
         $("#navbar_search").val("");
     };
 
+    $scope.notification_timer = null;
     $scope.category_list = $rootScope.category_list;
     $scope.isLoggedIn = AuthService.IsLoggedIn();
 
     if ($scope.isLoggedIn) {
         $scope.get_current_user();
+        $scope.get_notifications();
+        $scope.set_notificaton_timer();
     }
 }]);
 

@@ -1,5 +1,6 @@
 from flask import Blueprint, g, make_response, abort, request
 from core.permission import auth
+from core.notification import send_message_notification
 import json
 
 message = Blueprint("message", __name__)
@@ -65,6 +66,8 @@ def send_message(user_id):
     cur.execute("INSERT INTO Message(SmallerUserId, GreaterUserId, SpeakerUserId, \
         Body) VALUES(%s, %s, %s, %s)", (str(smaller_userid), str(greater_userid),  
         str(g.user_id), req_body["content"]))
+
+    send_message_notification(g.user_id, user_id, req_body["content"])
 
     g.db.commit()
 

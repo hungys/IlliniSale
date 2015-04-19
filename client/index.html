@@ -68,11 +68,15 @@
                         </ul>
                     </li>
                     <li ng-show="isLoggedIn">
-                        <form class="navbar-form">
-                            <button type="button" class="btn btn-default">
+                        <li class="navbar-form dropdown">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
                                 <span class="glyphicon glyphicon-bell" aria-hidden="true"></span>
                             </button>
-                        </form>
+                            <ul class="dropdown-menu" role="menu">
+                                <li ng-hide="notification_list.length>0"><a href="">No notification<a/></li>
+                                <li ng-repeat="notification in notification_list"><a href="#{{notification.url}}"><span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span> {{notification.body}}</a></li>
+                            </ul>
+                        </li>
                     </li>
                     <li ng-hide="isLoggedIn"><a href="" ng-click="login()">Login</a></li>
                     <li ng-hide="isLoggedIn"><a href="#/user/register">Register</a></li>

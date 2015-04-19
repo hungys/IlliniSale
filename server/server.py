@@ -23,6 +23,8 @@ from core.bid import bid
 app.register_blueprint(bid, url_prefix="/api")
 from core.comment import comment
 app.register_blueprint(comment, url_prefix="/api")
+from core.notification import notification
+app.register_blueprint(notification, url_prefix="/api")
 
 app.autocomplete_provider = AutoCompleteProvider()
 app.autocomplete_provider.load_candidates()

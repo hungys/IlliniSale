@@ -1,5 +1,6 @@
 from flask import Blueprint, g, make_response, abort, request
 from core.permission import auth
+from core.notification import send_following_notification
 from md5 import md5
 import json
 import jwt
@@ -228,6 +229,7 @@ def toggle_user_follow(user_id):
     else:
         cur.execute("INSERT INTO Follow(FollowerUserId, FollowingUserId) \
             VALUES(%s, %s)", (str(g.user_id), str(user_id)))
+        send_following_notification(g.user_id, user_id)
 
     g.db.commit()
 
@@ -238,6 +240,7 @@ def toggle_user_follow(user_id):
     return resp
 
 @user.route('/user', methods=['GET'])
+@auth.login_required
 def get_user_settings():
     cur = g.db.cursor()
     cur.execute("SELECT Email, Nickname, FirstName, LastName, MobilePhone, Gender, Birthday, ProfilePic \
