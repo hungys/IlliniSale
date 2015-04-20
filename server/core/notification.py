@@ -52,7 +52,7 @@ def send_notification(user_id, body, url):
 
 def send_following_notification(follower_user_id, following_user_id):
     cur = g.db.cursor()
-    cur.execute("SELECT Nickname FROM User WHERE UserId = %s", (str(follower_user_id, )))
+    cur.execute("SELECT Nickname FROM User WHERE UserId = %s", (str(follower_user_id),))
 
     follower_nickname = cur.fetchone()[0]
     body = "%s started following you" % follower_nickname
@@ -62,7 +62,7 @@ def send_following_notification(follower_user_id, following_user_id):
 
 def send_message_notification(from_user_id, to_user_id, content):
     cur = g.db.cursor()
-    cur.execute("SELECT Nickname FROM User WHERE UserId = %s", (str(from_user_id, )))
+    cur.execute("SELECT Nickname FROM User WHERE UserId = %s", (str(from_user_id),))
 
     from_nickname = cur.fetchone()[0]
     body = "%s sent message to you: \"%s...\"" % (from_nickname, content[:15])
@@ -73,7 +73,7 @@ def send_message_notification(from_user_id, to_user_id, content):
 def send_bid_response_notification(seller_user_id, bidder_user_id, bid_id, action):
     cur = g.db.cursor()
 
-    cur.execute("SELECT Nickname FROM User WHERE UserId = %s", (str(seller_user_id, )))
+    cur.execute("SELECT Nickname FROM User WHERE UserId = %s", (str(seller_user_id),))
     seller_nickname = cur.fetchone()[0]
 
     cur.execute("SELECT Product.Name FROM Product, Bid WHERE Bid.BidId = %s \
@@ -88,7 +88,7 @@ def send_bid_response_notification(seller_user_id, bidder_user_id, bid_id, actio
 def send_bid_request_notification(bidder_user_id, bid_id):
     cur = g.db.cursor()
 
-    cur.execute("SELECT Nickname FROM User WHERE UserId = %s", (str(bidder_user_id, )))
+    cur.execute("SELECT Nickname FROM User WHERE UserId = %s", (str(bidder_user_id),))
     bidder_nickname = cur.fetchone()[0]
 
     cur.execute("SELECT Product.Name, Product.UserId FROM Product, Bid WHERE Bid.BidId = %s \
