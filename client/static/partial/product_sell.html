@@ -17,7 +17,23 @@
             </div>
             <div class="form-group">
                 <label for="tags">Tags</label>
-                <input type="text" maxlength="150" class="form-control" id="tags" placeholder='Example: tag1 tag2 "tag3 with space"' required>
+                <div ng-show="current_tags.length>0">
+                    <div class="row">
+                        <div class="col-md-3" ng-repeat="tag in current_tags track by $index">
+                            <button type="button" class="btn btn-default btn-xs" ng-click="remove_tag($index)" aria-label="Remove">
+                              <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                            </button>
+                            {{tag}}
+                        </div>
+                    </div>
+                    <br/>
+                </div>
+                <div class="form-group form-inline">
+                    <input type="text" maxlength="150" class="form-control" id="new_tag" placeholder="Enter custom tag">
+                    <button type="button" ng-click="add_tag()" class="btn btn-default">Add</button>
+                    <span ng-show="suggestion_tags.length>0"> &nbsp;or suggestion: 
+                        <span ng-repeat="tag in suggestion_tags track by $index"><a href="" ng-click="add_suggestion_tag($index)">{{tag}}</a> </span></span>
+                </div>
             </div>
             <div class="form-group">
                 <label for="price">Price</label>

@@ -3,6 +3,8 @@ from werkzeug import secure_filename
 from core.permission import auth
 from core.notification import send_bid_request_notification
 from core.database import connect_redis
+from collections import Counter
+import operator
 import json
 import os
 import uuid
@@ -204,7 +206,7 @@ def get_similar_product(product_id):
                 "likes": product_data[13]
             })
 
-    resp = make_response(json.dumps(resp_body), 200)
+    resp = make_response(json.dumps(resp_body[0:4]), 200)
     resp.headers["Content-Type"] = "application/json"
     return resp
 
@@ -338,6 +340,38 @@ def post_product():
     g.db.commit()
 
     resp_body = {"product_id": product_id}
+
+    resp = make_response(json.dumps(resp_body), 200)
+    resp.headers["Content-Type"] = "application/json"
+    return resp
+
+@product.route('/product/tag/suggestion', methods=['POST'])
+@auth.login_required
+def get_suggestion_tags():
+    req_body = json.loads(request.data)
+    cur = g.db.cursor()
+
+    if "name" in req_body:
+        similar_products = get_similar_products_by_name(req_body["name"])
+        candidate_tags = []
+        for product_id in similar_products:
+            candidate_tags.extend([tag.lower() for tag in get_tags_of_product(product_id)])
+        candidate_tags = Counter(candidate_tags)
+        resp_body = [t[0] for t in sorted(candidate_tags.items(), key=operator.itemgetter(1), reverse=True)[0:5] if t[1] > 0 and t[0]]
+    elif "tags" in req_body:
+        tags_union = set()
+        candidate_tags = []
+        ranked_tags = {}
+        for tag in req_body["tags"]:
+            co_occuring = get_co_occurring_tags(tag)
+            candidate_tags.append(co_occuring)
+            tags_union = tags_union.union([tag for tag in co_occuring])
+        for tag in tags_union:
+            ranked_tags[tag] = 0
+            for candidate_list in candidate_tags:
+                if tag in candidate_list:
+                    ranked_tags[tag] = ranked_tags[tag] + 1
+        resp_body = [t[0] for t in sorted(ranked_tags.items(), key=operator.itemgetter(1), reverse=True)[0:5] if t[1] > 0 and t[0] not in req_body["tags"]]
 
     resp = make_response(json.dumps(resp_body), 200)
     resp.headers["Content-Type"] = "application/json"
@@ -694,9 +728,35 @@ def get_tags_of_product(product_id):
 
     return tags
 
-def update_tags_of_product(product_id, tags_str):
+def get_similar_products_by_name(name):
+    cur = g.db.cursor()
+    tokens = [token for token in name.lower().split(" ") if len(token) > 3]
+    similar_ids = set()
+    for token in tokens:
+        pattern = "%" + token + "%"
+        cur.execute("SELECT ProductId FROM Product WHERE LCASE(Name) LIKE %s", (pattern,))
+        ids_data = cur.fetchall()
+        for id_data in ids_data:
+            similar_ids.add(int(id_data[0]))
+
+    return list(similar_ids)
+
+def get_co_occurring_tags(tag):
+    cur = g.db.cursor();
+    cur.execute("SELECT LCASE(Name), COUNT(LCASE(Name)) AS Count FROM Tag \
+        WHERE ProductId IN (SELECT ProductId FROM Tag WHERE Name = %s) AND Name <> %s \
+        GROUP BY LCASE(Name) ORDER BY Count DESC LIMIT 10", (tag, tag))
+
+    related_tags = {}
+    tags_data = cur.fetchall()
+    for tag_data in tags_data:
+        related_tags[tag_data[0]] = tag_data[1]
+
+    return related_tags
+
+def update_tags_of_product(product_id, tags):
     original_tag_set = set(get_tags_of_product(product_id))
-    updated_tag_set = set(parse_tags(tags_str))
+    updated_tag_set = set(tags)
 
     to_be_inserted = updated_tag_set.difference(original_tag_set)
     to_be_deleted = original_tag_set.difference(updated_tag_set)

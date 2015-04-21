@@ -663,7 +663,7 @@ myapp.controller('ProductSellController', ['$scope', '$rootScope', '$http', '$lo
                 description: $("#description").val(),
                 price: parseInt($("#price").val()),
                 location: $("#location").val(),
-                tags: $("#tags").val()
+                tags: $scope.current_tags
             })
             .success(function(response) {
                 if ($scope.uploader.queue.length == 0) {
@@ -676,6 +676,36 @@ myapp.controller('ProductSellController', ['$scope', '$rootScope', '$http', '$lo
             }).error(function(data, status, headers, config) {
                 alertify.error("Fail to submit, try again later!");
             });
+    };
+
+    $scope.add_tag = function() {
+        if ($("#new_tag").val() != "") {
+            for (var i = 0; i < $scope.current_tags.length; i++) {
+                if ($scope.current_tags[i] == $("#new_tag").val()) {
+                    alertify.error($("#new_tag").val() + " is existed");
+                    $("#new_tag").val("");
+                    return;
+                }
+            }
+            $scope.current_tags.push($("#new_tag").val());
+            $("#new_tag").val("");
+        }
+    };
+
+    $scope.remove_tag = function(index) {
+        $scope.current_tags.splice(index, 1);
+    };
+
+    $scope.add_suggestion_tag = function(index) {
+        for (var i = 0; i < $scope.current_tags.length; i++) {
+            if ($scope.current_tags[i] == $scope.suggestion_tags[index]) {
+                alertify.error($scope.suggestion_tags[index] + " is existed");
+                $scope.suggestion_tags.splice(index, 1);
+                return;
+            }
+        }
+        $scope.current_tags.push($scope.suggestion_tags[index]);
+        $scope.suggestion_tags.splice(index, 1);
     };
 
     var uploader = $scope.uploader = new FileUploader({
@@ -703,6 +733,37 @@ myapp.controller('ProductSellController', ['$scope', '$rootScope', '$http', '$lo
     };
 
     $scope.category_list = $rootScope.category_list;
+    $scope.current_tags = [];
+    $scope.suggestion_tags = []
+
+    $scope.$watchCollection('current_tags', function(newCol, oldCol, scope) {
+        if ($scope.current_tags.length > 0) {
+            $http.post(AppService.GetAPIServer() + '/api/product/tag/suggestion', {
+                tags: $scope.current_tags
+            })
+            .success(function(response) {
+                $scope.suggestion_tags = response;
+            });
+        } else if ($("#name").val() != "") {
+            $http.post(AppService.GetAPIServer() + '/api/product/tag/suggestion', {
+                name: $("#name").val()
+            })
+            .success(function(response) {
+                $scope.suggestion_tags = response;
+            });
+        }
+    });
+
+    $("#name").blur(function() {
+        if ($scope.current_tags.length == 0 && $("#name").val() != "") {
+            $http.post(AppService.GetAPIServer() + '/api/product/tag/suggestion', {
+                name: $("#name").val()
+            })
+            .success(function(response) {
+                $scope.suggestion_tags = response;
+            });
+        }
+    });
 }]);
 
 myapp.controller('ProductEditController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', 'FileUploader', function($scope, $rootScope, $http, $location, $route, AuthService, AppService, FileUploader) {
@@ -715,7 +776,7 @@ myapp.controller('ProductEditController', ['$scope', '$rootScope', '$http', '$lo
                 description: $scope.product.description,
                 price: parseInt($scope.product.price),
                 location: $scope.product.location,
-                tags: $scope.product.tags_str
+                tags: $scope.current_tags
             })
             .success(function(response) {
                 if ($scope.uploader.queue.length == 0) {
@@ -727,6 +788,36 @@ myapp.controller('ProductEditController', ['$scope', '$rootScope', '$http', '$lo
             }).error(function(data, status, headers, config) {
                 alertify.error("Fail to save, try again later!");
             });
+    };
+
+    $scope.add_tag = function() {
+        if ($("#new_tag").val() != "") {
+            for (var i = 0; i < $scope.current_tags.length; i++) {
+                if ($scope.current_tags[i] == $("#new_tag").val()) {
+                    alertify.error($("#new_tag").val() + " is existed");
+                    $("#new_tag").val("");
+                    return;
+                }
+            }
+            $scope.current_tags.push($("#new_tag").val());
+            $("#new_tag").val("");
+        }
+    };
+
+    $scope.remove_tag = function(index) {
+        $scope.current_tags.splice(index, 1);
+    };
+
+    $scope.add_suggestion_tag = function(index) {
+        for (var i = 0; i < $scope.current_tags.length; i++) {
+            if ($scope.current_tags[i] == $scope.suggestion_tags[index]) {
+                alertify.error($scope.suggestion_tags[index] + " is existed");
+                $scope.suggestion_tags.splice(index, 1);
+                return;
+            }
+        }
+        $scope.current_tags.push($scope.suggestion_tags[index]);
+        $scope.suggestion_tags.splice(index, 1);
     };
 
     $scope.delete_photo = function(photo) {
@@ -764,23 +855,43 @@ myapp.controller('ProductEditController', ['$scope', '$rootScope', '$http', '$lo
     };
 
     $scope.category_list = $rootScope.category_list;
+    $scope.current_tags = [];
+    $scope.suggestion_tags = []
 
     $http.get(AppService.GetAPIServer() + '/api/product/' + $scope.productId).success(function(response) {
         $scope.product = response
         if ($scope.product.seller.user_id != $rootScope.current_user.user_id) {
             $location.path('/product/' + $scope.productId);
         }
+        $scope.current_tags = response.tags
+    });
 
-        $scope.product.tags_str = "";
-        for (var i = 0; i < $scope.product.tags.length; i++) {
-            if ($scope.product.tags[i].indexOf(" ") > -1) {
-                $scope.product.tags_str += ("\"" + $scope.product.tags[i] + "\"");
-            } else {
-                $scope.product.tags_str += $scope.product.tags[i];
-            }
-            if (i != $scope.product.tags.length - 1) {
-                $scope.product.tags_str += " ";
-            }
+    $scope.$watchCollection('current_tags', function(newCol, oldCol, scope) {
+        if ($scope.current_tags.length > 0) {
+            $http.post(AppService.GetAPIServer() + '/api/product/tag/suggestion', {
+                tags: $scope.current_tags
+            })
+            .success(function(response) {
+                $scope.suggestion_tags = response;
+            });
+        } else if ($("#name").val() != "") {
+            $http.post(AppService.GetAPIServer() + '/api/product/tag/suggestion', {
+                name: $("#name").val()
+            })
+            .success(function(response) {
+                $scope.suggestion_tags = response;
+            });
+        }
+    });
+
+    $("#name").blur(function() {
+        if ($scope.current_tags.length == 0 && $("#name").val() != "") {
+            $http.post(AppService.GetAPIServer() + '/api/product/tag/suggestion', {
+                name: $("#name").val()
+            })
+            .success(function(response) {
+                $scope.suggestion_tags = response;
+            });
         }
     });
 }]);
