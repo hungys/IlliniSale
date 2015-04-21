@@ -643,6 +643,10 @@ myapp.controller('ProductDetailController', ['$scope', '$rootScope', '$http', '$
 
         document.title = $scope.product.name + " - IlliniSale";
     });
+
+    $http.get(AppService.GetAPIServer() + '/api/product/' + $scope.productId + '/similar').success(function(response) {
+        $scope.similar_products = response
+    });
 }]);
 
 myapp.controller('ProductSellController', ['$scope', '$rootScope', '$http', '$location', '$route', 'AuthService', 'AppService', 'FileUploader', function($scope, $rootScope, $http, $location, $route, AuthService, AppService, FileUploader) {

@@ -2,6 +2,7 @@ from flask import Blueprint, g, make_response, abort, request, current_app
 from werkzeug import secure_filename
 from core.permission import auth
 from core.notification import send_bid_request_notification
+from core.database import connect_redis
 import json
 import os
 import uuid
@@ -154,6 +155,54 @@ def get_product(product_id):
         "is_liked": is_liked,
         "new_bid_alert": new_bid_alert
     }
+
+    resp = make_response(json.dumps(resp_body), 200)
+    resp.headers["Content-Type"] = "application/json"
+    return resp
+
+@product.route('/product/<int:product_id>/similar', methods=['GET'])
+def get_similar_product(product_id):
+    redis_conn = connect_redis()
+    similar_ids = redis_conn.get(product_id)
+    resp_body = []
+
+    if similar_ids is not None:
+        cur = g.db.cursor()
+        similar_ids = json.loads(str(similar_ids))
+        for id in similar_ids:
+            cur.execute("SELECT Product.UserId, Product.Name, Product.Category, \
+                Product.Description, Product.Price, Product.Location, Product.IsSold, \
+                unix_timestamp(Product.CreateAt), User.Nickname, \
+                User.FirstName, User.LastName, User.ProfilePic, User.Gender, \
+                (SELECT COUNT(*) FROM Likes WHERE Likes.ProductId = Product.ProductId), \
+                (SELECT FileName FROM Photo WHERE Photo.ProductId = Product.ProductId LIMIT 1) \
+                FROM Product, User WHERE Product.ProductId = %s AND \
+                User.UserId = Product.UserId", (str(id),))
+            product_data = cur.fetchone()
+
+            if product_data is None:
+                continue
+
+            resp_body.append({
+                "product_id": id,
+                "seller": {
+                    "user_id": product_data[0],
+                    "nickname": product_data[8],
+                    "first_name": product_data[9],
+                    "last_name": product_data[10],
+                    "profile_pic": product_data[11],
+                    "gender": product_data[12]
+                },
+                "name": product_data[1],
+                "category": product_data[2],
+                "description": product_data[3],
+                "price": product_data[4],
+                "location": product_data[5],
+                "photo": product_data[14],
+                "is_sold": product_data[6],
+                "post_time": product_data[7],
+                "likes": product_data[13]
+            })
 
     resp = make_response(json.dumps(resp_body), 200)
     resp.headers["Content-Type"] = "application/json"
