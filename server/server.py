@@ -5,6 +5,8 @@ from flask import Flask, g, request, make_response
 from core.database import connect_db
 from core.permission import auth
 from core.auto_complete import AutoCompleteProvider
+from threading import Thread
+import jobs
 import json
 import jwt
 import config
@@ -26,8 +28,14 @@ app.register_blueprint(comment, url_prefix="/api")
 from core.notification import notification
 app.register_blueprint(notification, url_prefix="/api")
 
-app.autocomplete_provider = AutoCompleteProvider()
-app.autocomplete_provider.load_candidates()
+def start_autocomplete_init():
+    app.autocomplete_provider = AutoCompleteProvider()
+    autocomplete_job_thread = Thread(target=autocomplete_init)
+    autocomplete_job_thread.setDaemon(True)
+    autocomplete_job_thread.start()
+
+def autocomplete_init():
+    app.autocomplete_provider.load_candidates()
 
 @app.before_request
 def before_request():
@@ -81,11 +89,14 @@ def unauthorized():
 def not_found(error):
     return make_response(json.dumps({"msg": "Not found"}), 404)
 
+start_autocomplete_init()
+jobs.start_background_jobs()
+
 # if __name__ == '__main__':
 #     app.run(host='0.0.0.0', debug=True)
 
 if __name__ == '__main__':
     http_server = HTTPServer(WSGIContainer(app))
     http_server.listen(5000)
-    print "Flask app starting"
+    print "Flask app starting..."
     IOLoop.instance().start()

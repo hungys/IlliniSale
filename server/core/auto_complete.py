@@ -1,4 +1,5 @@
 from database import connect_db
+import threading
 
 class TerneryTreeNode:
 
@@ -77,24 +78,34 @@ class TerneryTreeNode:
 class AutoCompleteProvider:
     def __init__(self):
         self.root_node = TerneryTreeNode('', 0)
+        self.lock = threading.Lock()
 
     def insert(self, name):
         self.root_node.Add(name.lower(), self.root_node)
 
+    def insert_product(self, name):
+        self.insert(name)
+        for token in name.split(" "):
+            if len(token) > 2:
+                self.insert(token)
+
+    def insert_product_safe(self, name):
+        self.lock.acquire()
+        self.insert_product(name)
+        self.lock.release()
+
     def load_candidates(self):
+        print "Generating autocomplete tree..."
+
         db = connect_db()
         cur = db.cursor()
         cur.execute("SELECT DISTINCT Name FROM Product")
         candidates = cur.fetchall()
 
         for candidate in candidates:
-            self.insert(candidate[0])
-            for token in candidate[0].split(" "):
-                if len(token) > 0:
-                    self.insert(token)
+            self.insert_product(candidate[0])
 
         print "AutoCompleteProvider loaded"
-
         db.close()
 
     def autocomplete(self, keyword):

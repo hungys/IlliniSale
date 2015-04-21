@@ -338,6 +338,7 @@ def post_product():
     update_tags_of_product(product_id, req_body["tags"])
 
     g.db.commit()
+    current_app.autocomplete_provider.insert_product_safe(req_body["name"])
 
     resp_body = {"product_id": product_id}
 

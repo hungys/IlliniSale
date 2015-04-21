@@ -47,7 +47,7 @@ class RecommenderJob:
     def write_to_cache(self, similarities):
         for product_id, similar_list in similarities.items():
             if len(similar_list) > 0:
-                print product_id, similar_list
+                # print product_id, similar_list
                 self.cache_conn.setex(product_id, config.RECOMMENDATION_EXPIRATION, json.dumps(similar_list))
 
     def run(self):
@@ -58,5 +58,5 @@ class RecommenderJob:
         similarities = self.calculate_similarity(products)
         self.write_to_cache(similarities)
 
-        print "Cache will be expired in %d seconds" % config.RECOMMENDATION_EXPIRATION
-        print "Job success"
+        # print "Cache will be expired in %d seconds" % config.RECOMMENDATION_EXPIRATION
+        # print "Job success"
