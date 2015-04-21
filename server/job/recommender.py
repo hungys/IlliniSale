@@ -21,9 +21,18 @@ def tags_to_point(tags_set, tags_space):
 
 class RecommenderJob:
     def __init__(self):
+        self.db_conn = None
+        self.cache_conn = None
+        self.tags_space = []
+
+    def init_connection(self):
         self.db_conn = connect_db()
         self.cache_conn = connect_redis()
-        self.tags_space = []
+
+    def close_connection(self):
+        self.db_conn.close()
+        self.db_conn = None
+        self.cache_conn = None
 
     def get_tags_space(self):
         cur = self.db_conn.cursor()
@@ -51,12 +60,14 @@ class RecommenderJob:
                 self.cache_conn.setex(product_id, config.RECOMMENDATION_EXPIRATION, json.dumps(similar_list))
 
     def run(self):
+        self.init_connection()
         self.get_tags_space()
         products = self.get_all_products()
         for product_id in products:
             products[product_id] = tags_to_point(products[product_id], self.tags_space)
         similarities = self.calculate_similarity(products)
         self.write_to_cache(similarities)
+        self.close_connection()
 
         # print "Cache will be expired in %d seconds" % config.RECOMMENDATION_EXPIRATION
         # print "Job success"
