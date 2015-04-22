@@ -1,7 +1,7 @@
 from flask import Blueprint, g, make_response, abort, request, current_app
 from werkzeug import secure_filename
 from core.permission import auth
-from core.notification import send_bid_request_notification, send_product_comment_notification
+from core.notification import send_bid_request_notification, send_product_comment_notification, send_wantlist_notification
 from core.database import connect_redis
 from collections import Counter
 import operator
@@ -341,6 +341,8 @@ def post_product():
     current_app.autocomplete_provider.insert_product_safe(req_body["name"])
 
     resp_body = {"product_id": product_id}
+
+    send_wantlist_notification(product_id)
 
     resp = make_response(json.dumps(resp_body), 200)
     resp.headers["Content-Type"] = "application/json"

@@ -131,3 +131,21 @@ def send_bid_request_notification(bidder_user_id, bid_id):
     url = "/mybids?bid_id=%d" % bid_id
 
     send_notification(seller_user_id, body, url)
+
+def send_wantlist_notification(product_id):
+    cur = g.db.cursor()
+
+    cur.execute("SELECT ProductId, Name FROM Product WHERE ProductId = %s", (str(product_id),))
+    product_data = cur.fetchone()
+    product_id = product_data[0]
+    product_name = product_data[1]
+
+    body = "Product you may like: %s" % product_name
+    url = "/product/%d" % product_id
+
+    cur.execute("SELECT DISTINCT Wantlist.UserId FROM Wantlist, Product \
+        WHERE Product.Name LIKE CONCAT('%%', Wantlist.Name, '%%') AND Product.ProductId = %s", (str(product_id),))
+    wantlists_data = cur.fetchall()
+
+    for wantlist_data in wantlists_data:
+        send_notification(wantlist_data[0], body, url)
