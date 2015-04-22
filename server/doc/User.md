@@ -11,15 +11,17 @@ Response:
 
 ```
 {
-    "profile_pic": "user1.jpg",
-    "first_name": "Yu-Hsin",
+    "is_followed": 0,
+    "profile_pic": "user_1.jpg",
     "last_name": "Hung",
-    "following_count": 1,
-    "product_count": 4,
+    "following_count": 2,
+    "product_count": 16,
+    "nickname": "Jimmy",
+    "first_name": "Yu-Hsin",
+    "user_id": 1,
     "gender": false,
-    "follower_count": 1,
-    "nickname": "Hungys",
-    "register_time": 1426822712
+    "register_time": 1426822712,
+    "follower_count": 3
 }
 ```
 
@@ -34,13 +36,14 @@ Response: (array)
 ```
 [
     {
-        "profile_pic": "user2.jpg",
+        "is_followed": 1,
+        "profile_pic": "user_2.JPG",
         "first_name": "Yu-Hsin2",
         "last_name": "Hung",
         "user_id": 2,
-        "product_count": 0,
+        "product_count": 5,
         "gender": true,
-        "follower_count": 0,
+        "follower_count": 1,
         "nickname": "Hungys2"
     }
 ]
@@ -57,13 +60,14 @@ Response: (array)
 ```
 [
     {
-        "profile_pic": "user2.jpg",
+        "is_followed": 1,
+        "profile_pic": "user_2.JPG",
         "first_name": "Yu-Hsin2",
         "last_name": "Hung",
         "user_id": 2,
-        "product_count": 0,
+        "product_count": 5,
         "gender": true,
-        "follower_count": 0,
+        "follower_count": 1,
         "nickname": "Hungys2"
     }
 ]
@@ -80,16 +84,16 @@ Response: (array)
 ```
 [
     {
-        "category": "3C",
+        "category": "3c-tech",
         "is_sold": 0,
-        "likes": 2,
-        "product_id": 1,
+        "likes": 3,
+        "product_id": 8,
         "is_liked": 1,
         "location": "PAR",
-        "photo": "",
-        "description": "all new",
-        "price": 100,
-        "name": "MBPR"
+        "photo": "b0974338-da65-11e4-9b05-3c15c2daac86.jpg",
+        "description": "85% new, body only.",
+        "price": 1500,
+        "name": "Nikon D750 Body"
     }
 ]
 ```
@@ -106,55 +110,58 @@ Response:
 {
     "reviews": [
         {
-            "content": "good job 1",
+            "content": "Great",
             "reviewer": {
-                "profile_pic": "user2.jpg",
+                "profile_pic": "user_2.JPG",
                 "first_name": "Yu-Hsin2",
                 "last_name": "Hung",
                 "user_id": 2,
                 "gender": 1,
                 "nickname": "Hungys2"
             },
-            "review_id": 3,
-            "timestamp": 1426829865,
-            "rating": 5
+            "review_id": 28,
+            "timestamp": 1428116068,
+            "rating": 1
         }
     ],
-    "average": 5
+    "percentage": 100
 }
 ```
 
-# Request for access token
+# Follow/unfollow a user
 
-Endpoint: `POST /api/user/auth`
+Endpoint: `PUT /api/user/<user_id>/follow`
 
-Login required: No
-
-Comment:
-
-* token should be stored by client/browser for further requests
-* token may be expired
-
-Request:
-
-```
-{
-    "email": "hungys@hotmail.com",
-    "password": "12345"
-}
-```
+Login required: Yes
 
 Response:
 
 ```
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxfQ.jCMWRmaMpLh9n2lul8xmLe4hGHFA-VMQiY2ikdME4kA"
+    "followed": true   // current followed status
 }
 ```
 
-Todo:
+# Get my profile
 
-* token expiration (never expired now)
+Endpoint: `GET /api/user`
+
+Login required: Yes
+
+Response:
+
+```
+{
+    "profile_pic": "user_1.jpg",
+    "first_name": "Yu-Hsin",
+    "last_name": "Hung",
+    "gender": 0,
+    "mobile_phone": "6262412272",
+    "nickname": "Jimmy",
+    "email": "hungys@hotmail.com",
+    "birthday": "1993-03-19 00:00:00"
+}
+```
 
 # Register a new user
 
@@ -181,7 +188,30 @@ Response:
 
 ```
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxfQ.jCMWRmaMpLh9n2lul8xmLe4hGHFA-VMQiY2ikdME4kA"
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxfQ.jCMWRmaMpLh9n2lul8xmLe4hGHFA-VMQiY2ikdME4kA",
+    "user_id": 1
+}
+```
+
+# Check if email has been registered
+
+Endpoint: `POST /api/user/check`
+
+Login required: No
+
+Request:
+
+```
+{
+    "email": "hungys@hotmail.com"
+}
+```
+
+Response:
+
+```
+{
+    "valid": 1   // 1 if can be used, 0 if has been registered
 }
 ```
 
@@ -211,17 +241,51 @@ Request:
 
 Response: Empty
 
-# Follow/unfollow a user
+# Upload profile picture
 
-Endpoint: `PUT /api/user/<user_id>/follow`
+Endpoint: `POST /api/user/upload`
 
 Login required: Yes
+
+Comment:
+
+* Submit form using `multipart/form-data`
+
+Request:
+
+```
+user_id: <user_id>
+file: ......
+```
+
+Response: Empty
+
+# Request for access token
+
+Endpoint: `POST /api/user/auth`
+
+Login required: No
+
+Comment:
+
+* token should be stored by client/browser for further requests
+* token may be expired
+
+Request:
+
+```
+{
+    "email": "hungys@hotmail.com",
+    "password": "12345"
+}
+```
 
 Response:
 
 ```
 {
-    "followed": true   // current followed status
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxfQ.jCMWRmaMpLh9n2lul8xmLe4hGHFA-VMQiY2ikdME4kA",
+    "user_id": 1
 }
 ```
 
@@ -236,7 +300,7 @@ Request:
 ```
 {
     "content": "Good seller",
-    "rating": 5,
+    "rating": 1,   // -1 for negative, 0 for neutral, 1 for positive
     "bid_id": 1
 }
 ```
