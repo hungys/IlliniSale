@@ -1,7 +1,7 @@
 from flask import Blueprint, g, make_response, abort, request, current_app
 from werkzeug import secure_filename
 from core.permission import auth
-from core.notification import send_bid_request_notification
+from core.notification import send_bid_request_notification, send_product_comment_notification
 from core.database import connect_redis
 from collections import Counter
 import operator
@@ -453,6 +453,8 @@ def post_product_comment(product_id):
     g.db.commit()
 
     resp_body = {"comment_id": cur.lastrowid}
+
+    send_product_comment_notification(g.user_id, product_id)
 
     resp = make_response(json.dumps(resp_body), 200)
     resp.headers["Content-Type"] = "application/json"

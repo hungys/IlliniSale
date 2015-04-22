@@ -1,5 +1,6 @@
 from flask import Blueprint, g, make_response, abort, request
 from core.permission import auth
+from core.notification import send_product_comment_response_notification
 import json
 
 comment = Blueprint("comment", __name__)
@@ -24,5 +25,7 @@ def respond_to_comment(comment_id):
         str(comment_id)))
 
     g.db.commit()
+
+    send_product_comment_response_notification(comment_id)
 
     return '', 200

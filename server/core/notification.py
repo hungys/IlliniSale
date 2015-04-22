@@ -60,6 +60,36 @@ def send_following_notification(follower_user_id, following_user_id):
 
     send_notification(following_user_id, body, url)
 
+def send_product_comment_notification(from_user_id, product_id):
+    cur = g.db.cursor()
+    cur.execute("SELECT Nickname FROM User WHERE UserId = %s", (str(from_user_id),))
+    from_nickname = cur.fetchone()[0]
+
+    cur.execute("SELECT Name, UserId FROM Product WHERE ProductId = %s", (str(product_id),))
+    product_data = cur.fetchone()
+    product_name = product_data[0]
+    seller_user_id = product_data[1]
+
+    body = "%s posted a comment to %s" % (from_nickname, product_name)
+    url = "/product/%d" % product_id
+
+    send_notification(seller_user_id, body, url)
+
+def send_product_comment_response_notification(comment_id):
+    cur = g.db.cursor()
+    cur.execute("SELECT Comment.UserId, Product.ProductId, Product.Name FROM Comment, Product \
+        WHERE Comment.CommentId = %s AND Comment.ProductId = Product.ProductId", (str(comment_id),))
+    comment_data = cur.fetchone()
+
+    user_id = comment_data[0]
+    product_id = comment_data[1]
+    product_name = comment_data[2]
+
+    body = "Seller responed to your comment for %s" % product_name
+    url = "/product/%d" % product_id
+
+    send_notification(user_id, body, url)
+
 def send_message_notification(from_user_id, to_user_id, content):
     cur = g.db.cursor()
     cur.execute("SELECT Nickname FROM User WHERE UserId = %s", (str(from_user_id),))
