@@ -15,7 +15,7 @@ product = Blueprint("product", __name__)
 def get_products(category):
     page = request.args.get("page")
     page = 1 if page is None else int(page)
-    rows_per_page = 4
+    rows_per_page = 12
     offset = rows_per_page * (page - 1)
 
     if page <= 0:
@@ -220,7 +220,7 @@ def search_product():
     keyword_pattern = "%" + keyword_arg + "%"
     page = request.args.get("page")
     page = 1 if page is None else int(page)
-    rows_per_page = 3
+    rows_per_page = 9
     offset = rows_per_page * (page - 1)
 
     cur = g.db.cursor()
