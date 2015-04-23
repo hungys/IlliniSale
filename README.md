@@ -1,7 +1,7 @@
 IlliniSale
 ==========
 
-This is a application-oriented project for UIUC CS411 Database Systems developed by Team SegFaults.
+This is an application-oriented project for UIUC CS411 Database Systems, developed by Team SegFaults.
 
 # Summary
 
