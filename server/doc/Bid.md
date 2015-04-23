@@ -63,3 +63,15 @@ Request:
 ```
 
 Response: Empty
+
+# Delete a bid
+
+Endpoint: `DELETE /api/bid/<bid_id>`
+
+Login required: Yes
+
+Comment:
+
+* return 403 if operates on other user's product
+
+Response: Empty

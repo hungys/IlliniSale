@@ -293,6 +293,7 @@ Login required: Yes
 Comment:
 
 * The properties not provided in request payload will remain for the old value
+* return 403 if operates on other user's product
 
 Request:
 
@@ -374,6 +375,10 @@ Endpoint: `PUT /api/product/<product_id>/sold`
 
 Login required: Yes
 
+Comment:
+
+* return 403 if operates on other user's product
+
 Response:
 
 ```
@@ -406,6 +411,10 @@ Response: Empty
 Endpoint: `DELETE /api/product/upload/<photo_id>`
 
 Login required: Yes
+
+Comment:
+
+* return 403 if operates on other user's product
 
 Response: Empty
 
